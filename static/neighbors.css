@@ -1,0 +1,25 @@
+.neighbor-filters { display: flex; gap: 1.25rem; align-items: end; flex-wrap: wrap; }
+.neighbor-filters .field { flex: 1 1 15rem; margin: 0; }
+.neighbor-filters .button { margin-bottom: 0; }
+.neighbor-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 2rem; margin-top: 2rem; align-items: start; }
+.neighbor-map-card { border: 1px solid var(--line); border-radius: 1.25rem; padding: 1.5rem; background: var(--white); min-width: 0; }
+.neighbor-map-heading h2, .neighbor-results-heading h2 { font-size: 2rem; line-height: 1.15; margin-block: .6rem 1.25rem; }
+.neighbor-map-intro { background: var(--green); border: 1px solid var(--line); border-radius: 1rem; text-align: center; padding: 2rem 1.5rem; }
+.neighbor-map-intro h3 { font: 2.4rem/1.12 Georgia, serif; margin: .75rem 0 1rem; }
+.neighbor-map-intro p { line-height: 1.7; margin-bottom: 1rem; }
+.neighbor-map-symbol { font-size: 4rem; color: var(--purple); }
+.neighbor-map { min-height: 28rem; border-radius: 1rem; background: var(--green); }
+.neighbor-map-links { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: center; margin: 1rem 0; }
+.neighbor-map-card > .field-help { margin-block: .75rem; }
+.neighbor-card { margin-top: 1rem; }
+.neighbor-card p { line-height: 1.7; margin-block: .75rem 1rem; overflow-wrap: anywhere; }
+.neighbor-card-heading { display: flex; gap: .9rem; align-items: center; flex-wrap: wrap; }
+.neighbor-card-heading h3 { font: 1.65rem/1.2 Georgia, serif; margin: 0; }
+.neighbor-card-heading p { color: var(--muted); font-size: .9rem; margin: .3rem 0; }
+.neighbor-avatar { flex-shrink: 0; display: grid; place-items: center; width: 3.2rem; height: 3.2rem; border-radius: 50%; background: var(--lavender); color: var(--purple); font: 1.6rem Georgia, serif; }
+.neighbor-interest { display: inline-block; margin-top: 1rem; font-size: .85rem; border-radius: 2rem; background: var(--lavender); padding: .5rem .8rem; }
+.neighbor-care { margin-top: 2rem; }.neighbor-care p { line-height: 1.8; }.neighbor-care h2 { font-size: 1.8rem; margin-bottom: 1rem; }
+.neighbor-results-heading p { color: var(--muted); font-size: .9rem; }
+.neighbor-setup-steps { padding-left: 1.5rem; line-height: 1.8; }.neighbor-setup-steps li { margin-bottom: 1rem; }
+html[data-text-size="175"] .neighbor-layout, html[data-text-size="200"] .neighbor-layout { grid-template-columns: minmax(0,1fr); }
+@media (max-width: 850px) { .neighbor-layout { grid-template-columns: minmax(0,1fr); }.neighbor-map { min-height: 22rem; } }

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Integration setup — TechNeighbor{% endblock %}
 {% block content %}<section class="wrap integration-page">
-<a class="back-link" href="{% url 'dashboard' %}">← Coordinator dashboard</a><p class="eyebrow">ARC TESTNET + ELEVENLABS</p><h1>Connect your community tools.</h1><p class="integration-intro">Only coordinators can access this page. Keys are stored privately on this computer and are never included in public proof files.</p>
+<a class="back-link" href="{% url 'dashboard' %}">← Coordinator dashboard</a><p class="eyebrow">ARC TESTNET + ELEVENLABS</p><h1>Connect your community tools.</h1><p><a class="text-link" href="{% url 'neighbor_maps_setup' %}">Set up Google Maps for Nearby neighbors →</a></p><p class="integration-intro">Only coordinators can access this page. Keys are stored privately on this computer and are never included in public proof files.</p>
 <div class="integration-grid">
   <section class="integration-card"><p class="eyebrow">BLOCKCHAIN CREDENTIALS</p><h2>Arc Testnet</h2><p>Confirm a volunteer’s service with a public, independently checkable record. Test tokens have no real-money value.</p>
     {% if chain.connected %}<p class="connection-status">Connected · Block {{ chain.block }}</p>{% else %}<p role="status">{{ chain.error }}</p>{% endif %}

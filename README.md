@@ -13,6 +13,7 @@ python -m pip install -r requirements.txt
 python manage.py migrate
 python manage.py setup_demo
 python manage.py setup_community
+python manage.py setup_neighbors
 python manage.py runserver 127.0.0.1:8000
 ```
 
@@ -22,6 +23,7 @@ On macOS, `Start TechNeighbor.command` performs setup and starts the local serve
 
 - Three categories and nine activities: companionship (chat, gentle walk, board game), everyday help (errand planning, small-task organization, everyday letters), and technology help (video calls, phone basics, photos).
 - Session booking, printing, cancellation, coordinator completion, and status/category filters. Database constraints prevent double-booking across categories.
+- Nearby-neighbor directory with area/interest filters, Google Maps links, opt-in reviewed profiles, and private coordinator introductions.
 - Community hub with activities, private attendance lists, seat reservations, and coordinator notices.
 - Shared community photo albums with coordinator approval, accessible descriptions, owner removal, and reporting.
 - Light/dark mode, remembered text sizes from 90% to 200%, keyboard controls, text labels, visible focus, reduced-motion support, and written equivalents of every spoken instruction.
@@ -29,6 +31,20 @@ On macOS, `Start TechNeighbor.command` performs setup and starts the local serve
 - Staff-only issuance of volunteer service credentials for completed sessions; public verification, proof JSON export, revocation, and explorer links.
 
 All sessions start at the fictional community center. This prototype does not arrange home visits, deliveries, transportation, personal care, volunteer matching, or real messages.
+
+## Nearby neighbors and Google Maps
+
+Open `/neighbors/` to choose a supported general area and shared interest. **Open Google Maps** opens that city or neighborhood in Google Maps; **Find a public meeting place** searches nearby libraries and community centers. These use the official [Google Maps URLs API](https://developers.google.com/maps/documentation/urls/get-started), which requires no API key. The app does not ask for device location, calculate exact distances, or collect home addresses. Currently seeded areas are examples in California; coordinators can add other cities or neighborhoods from Neighbor review.
+
+Residents can opt into a public profile at `/neighbors/profile/`. Nickname, selected area, interest, and introduction remain private until a coordinator approves the listing. Editing requires a new review. The same browser session controls edits and withdrawal. Clearing cookies loses these controls; coordinator assistance is then needed. Withdrawal or coordinator hiding closes pending introduction requests involving that profile. Profile review does not verify identity or background.
+
+An approved resident can ask for an introduction to another approved resident. Their contact details and note are visible only to themselves and the coordinator, never in the public directory, Google Maps, ElevenLabs, or onchain. Requests are deduplicated and limited to three per requester per day. No email, text, or meeting is sent/booked automatically: the coordinator must obtain both people's agreement and arrange a public venue. Sample profiles are clearly fictional and cannot receive requests.
+
+Coordinators review profiles and introduction requests at `/coordinator/neighbors/`. Choose **Phone demo** to review the separate phone database. `python manage.py setup_neighbors` seeds four clearly fictional profiles and three example areas without overwriting real profiles. Run migrations and that command for each database profile.
+
+An optional interactive in-app map is implemented but is **not connected or live-tested with a Google key**. Maps links are the working default. To enable the interactive map later, use `/coordinator/neighbors/maps/` or environment variables `GOOGLE_MAPS_API_KEY` and `GOOGLE_MAPS_MAP_ID`. Enable Maps JavaScript API and billing in Google Cloud, restrict the browser key to exact website domains and Maps JavaScript API, and configure usage limits/billing alerts. See [Google’s official setup instructions](https://developers.google.com/maps/documentation/javascript/get-api-key). The saved key is outside Git in `.private/maps.json`; browser keys are necessarily visible to map visitors and must be restricted. `DEMO_MAP_ID` is used for testing unless a production map ID is configured.
+
+The Google script loads only after **Load Google map** is selected. Markers show broad area centers and counts, never individual homes or names. Profiles remain available if the map fails. The Maps provider may charge for interactive map loads; no Google billing account or key was created for this feature.
 
 ## Expanded ElevenLabs experience
 
@@ -106,7 +122,7 @@ python manage.py check
 python manage.py test
 ```
 
-The 58 passing tests include upload validation, metadata removal, pending-photo privacy, approval, removal, reports, CSRF, reservation capacity, and cross-database phone moderation. The tests also execute real compiled Solidity bytecode in a local PyEVM Ethereum test engine and cover issuer permissions, duplicate IDs, revocation, privacy, public verification, outages, CSRF and the ElevenLabs API request shape. Local EVM tests are not a replacement for testing Arc-specific runtime differences. Public Arc Testnet issuance and revocation were also exercised against the deployment above. Provider request tests use a mock ElevenLabs response. Separately, all 15 guide and lesson clips were generated through the actual ElevenLabs API, and browser playback plus slower reading speed were verified with the configured account. The local demonstration key is restricted to Text to Speech, capped at 3,000 credits per refresh period, and expires November 22, 2026. The key itself is excluded from exports.
+The 72 passing tests include upload validation, metadata removal, pending-photo privacy, approval, removal, reports, CSRF, reservation capacity, and cross-database phone moderation. Neighbor tests cover profile consent/privacy, approval and withdrawal, area/interest filtering, private and deduplicated introductions, request limits, Google URL encoding, Maps key setup permissions, and phone-demo route restrictions. The tests also execute real compiled Solidity bytecode in a local PyEVM Ethereum test engine and cover issuer permissions, duplicate IDs, revocation, privacy, public verification, outages, CSRF and the ElevenLabs API request shape. Local EVM tests are not a replacement for testing Arc-specific runtime differences. Public Arc Testnet issuance and revocation were also exercised against the deployment above. Provider request tests use a mock ElevenLabs response. Separately, all 15 guide and lesson clips were generated through the actual ElevenLabs API, and browser playback plus slower reading speed were verified with the configured account. The local demonstration key is restricted to Text to Speech, capped at 3,000 credits per refresh period, and expires November 22, 2026. The key itself is excluded from exports.
 
 To rebuild the artifact, install Node.js and `solc@0.8.30`, then run `node contracts/compile.cjs`. Recompilation is not required to run the app. Keep `ServiceCredentials.sol` and its compiled JSON together.
 

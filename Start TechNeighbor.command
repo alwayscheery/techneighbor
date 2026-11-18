@@ -8,6 +8,7 @@ fi
 .venv/bin/python manage.py migrate
 .venv/bin/python manage.py setup_demo
 .venv/bin/python manage.py setup_community
+.venv/bin/python manage.py setup_neighbors
 echo ""
 echo "Open http://127.0.0.1:8000 in your browser."
 echo "Coordinator sign-in details are in LOCAL_ACCESS.txt."

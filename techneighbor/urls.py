@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from booking import views
 from booking import credential_views
-from booking import community_views
+from booking import community_views, neighbor_views
 urlpatterns = [
     path('', views.home, name='home'),
     path('book/', views.book, name='book'),
@@ -22,6 +22,11 @@ urlpatterns = [
     path('voice/audio/', credential_views.voice_audio, name='voice_audio'),
     path('learn/', community_views.learn, name='learn'),
     path('learn/<slug:lesson>/', community_views.learn, name='lesson'),
+    path('neighbors/', neighbor_views.directory, name='neighbors'),
+    path('neighbors/profile/', neighbor_views.my_profile, name='neighbor_profile'),
+    path('neighbors/<uuid:neighbor_id>/introduce/', neighbor_views.introduce, name='neighbor_introduce'),
+    path('coordinator/neighbors/', neighbor_views.moderate, name='neighbor_review'),
+    path('coordinator/neighbors/maps/', neighbor_views.maps_setup, name='neighbor_maps_setup'),
     path('community/', community_views.hub, name='community_hub'),
     path('community/events/<slug:slug>/', community_views.event_detail, name='community_event'),
     path('community/events/<slug:slug>/attendance/', community_views.event_attendance, name='community_attendance'),

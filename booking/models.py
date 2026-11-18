@@ -182,3 +182,42 @@ class PhotoReport(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['photo', 'owner_token'], name='one_photo_report_per_device')]
+
+
+class NeighborArea(models.Model):
+    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=100)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class NeighborProfile(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    owner_token = models.CharField(max_length=64, unique=True, editable=False)
+    area = models.ForeignKey(NeighborArea, on_delete=models.PROTECT, related_name='neighbors')
+    nickname = models.CharField(max_length=40)
+    interest = models.CharField(max_length=20, choices=[('company', 'Coffee & conversation'), ('walking', 'Gentle walks'), ('technology', 'Learning technology'), ('photos', 'Photos & stories')])
+    about = models.CharField(max_length=240)
+    status = models.CharField(max_length=12, default='pending', choices=[('pending', 'Awaiting review'), ('approved', 'Listed'), ('hidden', 'Not listed')])
+    is_sample = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class NeighborIntroduction(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    requester = models.ForeignKey(NeighborProfile, on_delete=models.CASCADE, related_name='introductions_sent')
+    neighbor = models.ForeignKey(NeighborProfile, on_delete=models.CASCADE, related_name='introductions_received')
+    contact = models.CharField(max_length=120)
+    note = models.CharField(max_length=300, blank=True)
+    status = models.CharField(max_length=12, default='pending', choices=[('pending', 'Needs review'), ('arranged', 'Handled'), ('closed', 'Closed')])
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['requester', 'neighbor'], condition=models.Q(status='pending'), name='one_pending_neighbor_introduction')]

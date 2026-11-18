@@ -45,3 +45,9 @@ def elevenlabs_settings():
         'api_key': os.environ.get('ELEVENLABS_API_KEY') or saved.get('api_key', ''),
         'voice_id': os.environ.get('ELEVENLABS_VOICE_ID') or saved.get('voice_id', 'JBFqnCBsd6RMkjVDRZzb'),
     }
+
+
+def maps_settings():
+    saved = read_private('maps.json')
+    return {'api_key': os.environ.get('GOOGLE_MAPS_API_KEY') or saved.get('api_key', ''),
+            'map_id': os.environ.get('GOOGLE_MAPS_MAP_ID') or saved.get('map_id') or 'DEMO_MAP_ID'}
