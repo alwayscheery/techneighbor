@@ -1,0 +1,16 @@
+{% load static %}
+<section id="spoken-guide" class="voice-guide" aria-labelledby="voice-guide-heading" data-guide-category="{{ selected_category|default:'welcome' }}" data-guide-remember="{% if selected_category %}true{% else %}false{% endif %}">
+  <div class="voice-guide-heading"><div><p class="eyebrow">LISTEN, READ, AND TAKE YOUR TIME</p><h2 id="voice-guide-heading">{% if selected_category == 'confirmation' %}Your next steps, spoken clearly.{% else %}A friendly voice, step by step.{% endif %}</h2></div><button type="button" class="button button-outline" id="guide-start">{% if selected_category == 'confirmation' %}Listen to next steps{% else %}Start spoken guide{% endif %}</button></div>
+  <p class="field-help">Hear the booking instructions with ElevenLabs. Only written guide instructions are sent to the voice service. Your name, contact details, and appointment time are not sent.</p>
+  <div id="guide-player" hidden>
+    <p id="guide-transcript" class="guide-transcript"></p>
+    {% if selected_category != 'confirmation' %}<div class="guide-buttons" role="group" aria-label="Spoken guide steps"><button type="button" data-guide-prompt="{{ selected_category|default:'welcome' }}">1. Choose support</button><button type="button" data-guide-prompt="time">2. Choose a time</button><button type="button" data-guide-prompt="details">3. Your details</button><button type="button" data-guide-prompt="review">4. Review & book</button></div>{% endif %}
+    <audio id="guide-audio" controls preload="none" aria-label="Spoken booking instructions"></audio>
+    <div class="guide-speed"><label for="guide-speed">Reading speed</label><select id="guide-speed"><option value="0.75">Slower</option><option value="1" selected>Normal</option></select></div>
+    <p id="guide-status" class="field-help" role="status" aria-live="polite"></p>
+    <button class="text-button" type="button" id="guide-stop">Stop spoken guide</button>
+  </div>
+  <form id="guide-token" hidden>{% csrf_token %}</form>
+</section>
+{{ voice_prompts|json_script:'voice-prompts' }}
+<script src="{% static 'voice-guide.js' %}" defer></script>

@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.pyc
+db.sqlite3*
+.local-secret
+LOCAL_ACCESS.txt
+.env
+.DS_Store
+.private/
+node_modules/
+
+# Local data, credentials, and editor state
+.env.*
+*.sqlite3
+*.sqlite3-*
+*.pem
+*.key
+media/
+uploads/
+.vscode/
+.pytest_cache/
+.coverage
+htmlcov/

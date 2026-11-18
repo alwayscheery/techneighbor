@@ -1,0 +1,53 @@
+.spoken-guide-link { margin-top: 17px; font-size:0.875rem; }
+.spoken-guide-link a { color: var(--purple); }
+.voice-guide { margin-top: 30px; padding: 25px; border: 1px solid var(--line); border-radius: 16px; background: var(--lavender); }
+.voice-guide-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.voice-guide h2 { font-size:1.6875rem; margin-block: 6px 14px; letter-spacing: -.6px; }
+.voice-guide .eyebrow { color: var(--purple); }
+.voice-guide .field-help { font-size:0.875rem; }
+.voice-guide [hidden] { display: none; }
+.guide-transcript { font-size:1.125rem; line-height: 1.8; padding-block: 20px; color: var(--ink); }
+.guide-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.guide-buttons button { min-height: 48px; padding: 10px 15px; border-radius: 8px; background: var(--white); color: var(--ink); border: 1px solid var(--control-border); font-size:0.9375rem; }
+.guide-buttons button[aria-pressed="true"] { background: var(--button-bg); color: var(--button-ink); border-color: var(--button-bg); }
+.voice-guide audio { display: block; width: min(100%, 560px); margin-bottom: 12px; }
+.guide-speed { display: flex; align-items: center; gap: 12px; font-size:0.9375rem; }
+.guide-speed select { min-height: 44px; font: inherit; padding: 8px; background: var(--white); color: var(--ink); border: 1px solid var(--control-border); border-radius: 6px; }
+.integration-page, .credential-page, .credential-form-page { padding-block: 35px 65px; }
+.integration-page h1, .credential-page h1, .credential-form-page h1 { font-size:clamp(2.125rem, 4vw, 3.125rem); margin-block: 15px 20px; }
+.integration-intro, .credential-explanation { max-width: 760px; font-size:1rem; margin-bottom: 30px; }
+.integration-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.integration-card, .credential-proof-card { background: var(--white); border: 1px solid var(--line); border-radius: 16px; padding: 28px; }
+.integration-card h2, .credential-proof-card h2 { font-size:1.9375rem; margin-block: 10px 20px; }
+.integration-card > p { font-size:0.9375rem; margin-bottom: 18px; }
+.integration-card form { margin-top: 25px; }
+.integration-card .connection-status { color: var(--purple); font-weight: 600; }
+.proof-details { margin-block: 25px; font-size:0.9375rem; }
+.proof-details dt { color: var(--muted); margin-top: 16px; font-size:0.8125rem; }
+.proof-details dd { margin: 5px 0 0; overflow-wrap: anywhere; }
+.wallet-address { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; font-size:0.8125rem; }
+.proof-actions { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 24px; }
+.credential-page { max-width: 850px; }
+.credential-proof-card > .badge { font-size:0.875rem; }
+.credential-admin { margin-top: 28px; padding: 25px; border: 1px solid var(--line); border-radius: 12px; }
+.credential-admin h2 { font-size:1.5625rem; }
+.credential-admin p { font-size:0.875rem; margin-block: 15px; }
+.credential-admin summary { cursor: pointer; min-height: 48px; padding-block: 12px; font-size:1rem; }
+.credential-form-page { max-width: 780px; }
+.credential-form { background: var(--white); border: 1px solid var(--line); border-radius: 15px; padding: 27px; margin-block: 25px; }
+.credential-form .confirmation-note { margin-block: 25px; }
+.approval-field label { display: flex; align-items: flex-start; gap: 12px; line-height: 1.7; }
+.approval-field input[type="checkbox"] { width: 23px; min-width: 23px; height: 23px; min-height: 23px; margin-top: 3px; accent-color: var(--purple); }
+.credential-form .field input[type="checkbox"] { padding: 0; }
+@media (max-width: 760px) {
+  .voice-guide { padding: 21px; }
+  .voice-guide-heading { display: block; }
+  .voice-guide-heading .button { margin-bottom: 16px; font-size:1rem; width: 100%; }
+  .guide-buttons { display: grid; grid-template-columns: 1fr 1fr; }
+  .guide-buttons button { font-size:0.875rem; }
+  .integration-grid { grid-template-columns: 1fr; }
+  .integration-card, .credential-proof-card { padding: 23px; }
+  .dashboard-toolbar { flex-wrap: wrap; }
+  .site-header nav { flex-wrap: wrap; justify-content: flex-end; }
+}
+@media print { .voice-guide, .credential-admin { display: none; } }

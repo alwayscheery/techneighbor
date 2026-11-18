@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Integration setup — TechNeighbor{% endblock %}
+{% block content %}<section class="wrap integration-page">
+<a class="back-link" href="{% url 'dashboard' %}">← Coordinator dashboard</a><p class="eyebrow">ARC TESTNET + ELEVENLABS</p><h1>Connect your community tools.</h1><p class="integration-intro">Only coordinators can access this page. Keys are stored privately on this computer and are never included in public proof files.</p>
+<div class="integration-grid">
+  <section class="integration-card"><p class="eyebrow">BLOCKCHAIN CREDENTIALS</p><h2>Arc Testnet</h2><p>Confirm a volunteer’s service with a public, independently checkable record. Test tokens have no real-money value.</p>
+    {% if chain.connected %}<p class="connection-status">Connected · Block {{ chain.block }}</p>{% else %}<p role="status">{{ chain.error }}</p>{% endif %}
+    {% if chain.address %}<dl class="proof-details"><dt>Organization test wallet</dt><dd class="wallet-address">{{ chain.address }}</dd><dt>Test USDC balance</dt><dd>{{ chain.balance|default:'Could not check' }}</dd></dl>
+    {% if chain.ready %}<p class="connection-status">Registry deployed and code checked</p><a class="text-link wallet-address" href="https://explorer.testnet.arc.io/address/{{ chain.contract }}" target="_blank" rel="noopener noreferrer">{{ chain.contract }} ↗</a>
+    {% else %}<p>Request free Arc Testnet USDC for the wallet above at <a href="https://faucet.circle.com/" target="_blank" rel="noopener noreferrer">Circle’s official faucet</a>. Then deploy the registry.</p>{% endif %}
+    <form method="post">{% csrf_token %}<button class="button button-outline" type="submit" name="action" value="deploy">{% if chain.ready %}Check registry{% else %}Check and deploy{% endif %}</button></form>
+    {% else %}<form method="post">{% csrf_token %}<button class="button" type="submit" name="action" value="wallet">Create organization test wallet</button></form>{% endif %}
+    <p class="field-help">This is a fictional demo issuer. A blockchain record does not establish that a real community organization approved it.</p>
+  </section>
+  <section class="integration-card"><p class="eyebrow">SPOKEN BOOKING GUIDANCE</p><h2>ElevenLabs</h2><p>Spoken instructions guide people through choosing support, picking a time, entering details, and reviewing a booking.</p><p class="connection-status">{% if voice_connected %}API key saved · Test the audio below{% else %}Not connected · Add your API key{% endif %}</p>
+    <form method="post">{% csrf_token %}<input type="hidden" name="action" value="voice">{% if form.errors %}<div class="error-summary" role="alert">Please check your voice settings. {{ form.errors }}</div>{% endif %}{% for field in form %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>{% endfor %}<p class="field-help">Leave the API key blank to keep the saved key. Obtain a key and an available voice ID in your ElevenLabs account. Requests may use that account’s credits.</p><button class="button" type="submit">Save voice connection</button></form>
+  </section>
+</div>
+{% include 'voice_guide.html' %}
+<p class="field-help">After saving your key, start the spoken guide to test it. Written instructions remain available if the voice service is unavailable.</p>
+</section>{% endblock %}

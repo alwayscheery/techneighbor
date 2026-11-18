@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="wrap hero">
+  <div class="hero-copy">
+    <p class="eyebrow"><span class="live-dot"></span> GOOD COMPANY. EVERYDAY SUPPORT.</p>
+    <h1>A little help.<br>A whole new<br><em>connection.</em></h1>
+    <p class="hero-description">Someone to talk to. A hand with everyday tasks.<br class="desktop-break"> Help getting comfortable with technology.<br class="desktop-break"> Find a friendly neighbor, whatever your next step.</p>
+    <a class="button" href="{% url 'book' %}">Find a friendly helper <svg class="icon"><use href="#i-arrow"/></svg></a>
+    <p class="spoken-guide-link"><a href="{% url 'book' %}?guide=1#spoken-guide">Book with spoken guidance →</a> · <a href="{% url 'learn' %}">Try a spoken tech lesson →</a></p>
+    <p class="reassurance"><svg class="icon"><use href="#i-check"/></svg> Free sessions. Your pace. A little support goes a long way.</p>
+  </div>
+  <div class="hero-art" role="img" aria-label="Illustration of a friendly video call connecting two neighbors">
+    <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+    <div class="floating-tag tag-top"><span class="tag-star">✦</span> Small steps. Big smiles.</div>
+    <div class="call-window">
+      <div class="window-bar"><span class="window-dots"><b></b><b></b><b></b></span><span>A familiar face, one tap away</span><svg class="icon"><use href="#i-heart"/></svg></div>
+      <svg class="portrait-scene" viewBox="0 0 460 330" fill="none" aria-hidden="true">
+        <rect width="460" height="330" fill="#E5EDD9"/>
+        <circle cx="376" cy="65" r="44" fill="#F6EBC4"/><path d="M25 330V151h72v179" fill="#CAD8B7"/>
+        <path d="M37 180c-15-29-9-52 9-64 15 21 15 41-1 64m3 34c24-28 44-31 59-19-10 25-31 34-59 25" fill="#82996B"/>
+        <rect x="21" y="248" width="71" height="82" rx="8" fill="#B3BF9E"/>
+        <path d="M113 330c3-74 34-117 116-117s117 43 120 117" fill="#7364A6"/>
+        <path d="m196 210-8 44 41 31 42-31-9-44" fill="#C98F68"/>
+        <ellipse cx="230" cy="148" rx="68" ry="83" fill="#DBA980"/>
+        <ellipse cx="162" cy="157" rx="11" ry="19" fill="#DBA980"/><ellipse cx="298" cy="157" rx="11" ry="19" fill="#DBA980"/>
+        <path d="M164 143c-16-49 5-98 57-103 53-7 88 26 82 89-11-3-20-24-25-41-29 25-75 33-114 27Z" fill="#F7F4EA"/>
+        <path d="M173 94c-5-33 21-59 48-56 0-26 49-23 54 5" fill="#F7F4EA"/>
+        <rect x="177" y="133" width="43" height="31" rx="12" stroke="#49423D" stroke-width="4"/><rect x="240" y="133" width="43" height="31" rx="12" stroke="#49423D" stroke-width="4"/><path d="M220 145c7-5 13-5 20 0m-63 0-15-4m121 4 14-4" stroke="#49423D" stroke-width="4"/>
+        <circle cx="200" cy="148" r="3" fill="#493C35"/><circle cx="259" cy="148" r="3" fill="#493C35"/>
+        <path d="m229 151-5 23 10 1" stroke="#B67D59" stroke-width="3" stroke-linecap="round"/>
+        <path d="M211 190c10 14 26 14 37 0" stroke="#874E3A" stroke-width="4" stroke-linecap="round"/>
+        <path d="m176 260 22 70m85-70-22 70" stroke="#8E80BC" stroke-width="3"/>
+        <rect x="338" y="212" width="101" height="98" rx="14" fill="#F5DCCB" stroke="#FFFCF5" stroke-width="5"/>
+        <path d="M351 309c1-32 14-48 37-48s38 16 39 48" fill="#D38A51"/><ellipse cx="389" cy="247" rx="23" ry="28" fill="#A96846"/>
+        <path d="M366 247c-8-31 9-43 26-38 25-2 30 18 21 39l-7-20-35 5Z" fill="#433C35"/>
+        <path d="M381 256c5 5 10 5 15 0" stroke="#613D2B" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <div class="call-bottom"><span class="call-name">Hello, possibility.</span><span class="call-buttons"><span><svg class="icon"><use href="#i-video"/></svg></span><span class="hangup">⌁</span></span></div>
+    </div>
+    <div class="floating-tag tag-bottom"><span class="mini-check"><svg class="icon"><use href="#i-check"/></svg></span><div><strong>“It’s lovely to have someone.”</strong><span>That’s the feeling we’re here for.</span></div></div>
+    <span class="art-spark spark-one">✧</span><span class="art-spark spark-two">✳</span>
+  </div>
+</section>
+<section class="community-strip"><div class="wrap strip-inner"><p>A stronger community.<br><strong>One connection at a time.</strong></p><span><svg class="icon"><use href="#i-heart"/></svg> Friendly, one-to-one support</span><span><svg class="icon"><use href="#i-pin"/></svg> At your community center</span><span><svg class="icon"><use href="#i-clock"/></svg> 30 minutes, just for you</span></div></section>
+<section class="wrap topics-section" aria-labelledby="topics-heading">
+  <div class="section-heading"><div><p class="eyebrow">LET’S START WITH SOMETHING SMALL</p><h2 id="topics-heading">What would you like a hand with?</h2></div><p>Three ways to feel more supported.<br>One simple place to start.</p></div>
+  <div class="topic-grid">
+    {% for key, category in categories.items %}
+    <a class="topic-card" href="{% url 'book' %}?category={{ key }}"><span class="topic-icon {{ category.color }}"><svg class="icon"><use href="#i-{{ category.icon }}"/></svg></span><span class="topic-number">0{{ forloop.counter }}</span><h3>{{ category.label }}</h3><p>{{ category.description }}</p><span class="card-link">{% if key == 'companionship' %}Find some company{% elif key == 'everyday' %}Get a helping hand{% else %}Learn something together{% endif %}<svg class="icon"><use href="#i-arrow"/></svg></span></a>
+    {% endfor %}
+  </div>
+</section>
+<section class="wrap community-feature-strip"><div><p class="eyebrow">MORE THAN A HELPING HAND</p><h2>A community to come back to.</h2><p>Find an activity, share a memory, and feel a little more connected.</p></div><div><a class="button" href="{% url 'community_hub' %}">Visit the community hub →</a><a class="button button-outline" href="{% url 'community_albums' %}">Photo albums ↗</a></div></section>
+<section id="how-it-works" class="wrap how-section" aria-labelledby="how-heading"><div class="how-intro"><p class="eyebrow">A HUMAN ON THE OTHER SIDE</p><h2 id="how-heading">Simple from<br>the very first step.</h2><p>Book for yourself or help someone you care about get started.</p></div><ol class="steps"><li><span>1</span><div><h3>Tell us what would help</h3><p>Choose companionship, everyday help, or technology support.</p></div></li><li><span>2</span><div><h3>Pick a time that works for you</h3><p>Reserve a free, in-person session at the center.</p></div></li><li><span>3</span><div><h3>Meet a friendly neighbor</h3><p>Chat, work through a task, or learn something together.</p></div></li></ol></section>
+<section class="wrap bottom-cta"><div><p class="eyebrow">YOU DON’T HAVE TO FIGURE IT OUT ALONE</p><h2>A little more connected. A little more supported.</h2></div><a href="{% url 'book' %}" class="button">Find some help <svg class="icon"><use href="#i-arrow"/></svg></a></section>
+{% endblock %}

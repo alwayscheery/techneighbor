@@ -1,0 +1,66 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Companionship, everyday help, and technology support. A friendly neighbor by your side.">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block title %}TechNeighbor — A little help goes a long way{% endblock %}</title>
+  <script src="{% static 'theme.js' %}"></script>
+  <script src="{% static 'text-size.js' %}"></script>
+  <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'style.css' %}?v=20261116-text">
+  <link rel="stylesheet" href="{% static 'theme.css' %}?v=20261116-text">
+  <link rel="stylesheet" href="{% static 'integrations.css' %}?v=20261116-text">
+  <link rel="stylesheet" href="{% static 'text-size.css' %}?v=20261116-text">
+  <link rel="stylesheet" href="{% static 'community.css' %}?v=20261116-community">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><rect x="3" y="6" width="12" height="12" rx="3"/><path d="m15 10 6-3v10l-6-3"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 5h4m-3 14h2"/></symbol>
+  <symbol id="i-photos" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-hands" viewBox="0 0 24 24"><path d="m3 14 4-3 4 3h5c3 0 3 3 0 3h-5m-8-3v6h11l7-6c2-2 0-4-2-2l-3 2M9 5l3-3 3 3v4H9Z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
+</svg>
+<div class="demo-bar">{% if request.phone_demo %}Temporary phone demo · Please use fictional details{% else %}A local prototype · Fictional community center & sample sessions{% endif %}</div>
+<div class="wrap display-settings" role="group" aria-label="Display settings">
+  <div id="text-size-controls" class="text-size-controls" role="group" aria-label="Text size" hidden>
+    <span class="text-size-label">Text size</span>
+    <button type="button" id="text-smaller" aria-label="Make text smaller">A−</button>
+    <output id="text-size-value" aria-label="Current text size">100%</output>
+    <button type="button" id="text-bigger" aria-label="Make text bigger">A+</button>
+    <button type="button" id="text-size-reset" aria-label="Reset text size">Reset</button>
+    <span id="text-size-status" class="visually-hidden" role="status" aria-live="polite"></span>
+  </div>
+  <span id="theme-label">Dark mode</span>
+  <button type="button" class="theme-switch" id="theme-switch" role="switch"
+          aria-checked="false" aria-labelledby="theme-label" hidden>
+    <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+    <span class="switch-state" aria-hidden="true">Off</span>
+  </button>
+  <noscript><span class="theme-no-script">Light mode · Enable JavaScript to change appearance.</span></noscript>
+</div>
+<header class="site-header wrap">
+  <a class="brand" href="{% url 'home' %}" aria-label="TechNeighbor home"><span class="brand-mark" aria-hidden="true">✳</span>TechNeighbor<span class="brand-dot">.</span></a>
+  <nav aria-label="Main navigation">
+    <a href="{% url 'community_hub' %}" class="community-nav">Community hub</a>
+    <a href="{% url 'community_albums' %}" class="community-nav">Photo albums</a>
+    <a href="{% url 'learn' %}" class="community-nav">Spoken lessons</a>
+    <a href="{% url 'home' %}#how-it-works" class="nav-secondary">How it works</a>
+    {% if user.is_staff %}<a href="{% url 'dashboard' %}" class="nav-secondary">Coordinator</a><a href="{% url 'integration_setup' %}" class="nav-secondary">Integration setup</a><a href="{% url 'community_moderation' %}" class="nav-secondary">Community review</a>{% endif %}
+    <a href="{% url 'book' %}" class="button button-small">Find some help <svg class="icon"><use href="#i-arrow"/></svg></a>
+  </nav>
+</header>
+{% if messages %}<div class="wrap messages" role="status">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>{% endif %}
+<main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
+<footer class="wrap site-footer">
+  <div><a class="brand footer-brand" href="{% url 'home' %}"><span class="brand-mark" aria-hidden="true">✳</span>TechNeighbor<span class="brand-dot">.</span></a><p>A little support. A familiar face. A stronger community.</p></div>
+  <div class="footer-right"><span>Built around people.</span>{% if not request.phone_demo %}<a href="{% url 'dashboard' %}">Coordinator sign-in <span aria-hidden="true">↗</span></a>{% endif %}</div>
+</footer>
+</body></html>

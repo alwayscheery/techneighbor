@@ -1,0 +1,20 @@
+{
+  "schema": "techneighbor.service.v1",
+  "network": "Arc Testnet",
+  "chain_id": 5042002,
+  "credential_id": "0x00000000000000000000000000000000f18e62baad7f4da48ee929cb31c6b0e5",
+  "contract_address": "0x0787438357a9A46AA2560f3f019c0677b5a2C8a8",
+  "issuer_wallet": "0xb311D3e025270af9e6c3C78BCAB230BEe98B7321",
+  "volunteer_wallet": "0x8b5b29b6e7cb55E1489f447EaC36b88e751279B0",
+  "issue_transaction": "0x5b70b07579216f9d456893244311036218d59126b171e53cf2285fdfcb5503ed",
+  "revocation_transaction": null,
+  "verification": {
+    "state": "valid",
+    "label": "Verified on Arc Testnet",
+    "volunteer": "0x8b5b29b6e7cb55E1489f447EaC36b88e751279B0",
+    "issuer": "0xb311D3e025270af9e6c3C78BCAB230BEe98B7321",
+    "issued_at": "2026-11-16 02:25:30+00:00",
+    "revoked_at": null,
+    "checked_block": 72504292
+  }
+}

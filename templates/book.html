@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Book a free session — TechNeighbor{% endblock %}
+{% block content %}
+<div class="wrap page-layout">
+  <div class="page-intro"><a class="back-link" href="{% url 'home' %}">← Back to home</a><p class="eyebrow">ONE SMALL STEP, TOGETHER</p><h1>Let’s find you<br>a little help.</h1><p>A free, 30-minute session.<br>A friendly person. Time for what matters to you.</p></div>
+  {% include 'voice_guide.html' %}
+  <nav class="support-selector" aria-label="Choose the kind of support">
+    {% for key, details in categories.items %}<a href="{% url 'book' %}?category={{ key }}" {% if selected_category == key %}aria-current="page"{% endif %}><span class="topic-icon {{ details.color }}"><svg class="icon"><use href="#i-{{ details.icon }}"/></svg></span><span><strong>{{ details.label }}</strong><span>{{ details.description }}</span></span></a>{% endfor %}
+  </nav>
+  <div class="booking-layout">
+    <form method="post" class="booking-form" novalidate>
+      {% csrf_token %}<input type="hidden" name="category" value="{{ selected_category }}">
+      {% if form.errors %}<div class="error-summary" role="alert" tabindex="-1"><strong>Let’s check a few details.</strong><ul>{% for field in form %}{% for error in field.errors %}<li><a href="#{{ field.auto_id }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}{% endfor %}{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul></div>{% endif %}
+      <fieldset id="id_topic"><legend><span class="step-num">1</span>What would you enjoy or find helpful?</legend><p class="field-help category-help">{{ category.label }} · {{ category.description }}</p><div class="topic-options">{% for radio in form.topic %}<label class="choice topic-choice">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>{% endfor %}</div></fieldset>
+      <fieldset id="id_slot"><legend><span class="step-num">2</span>Choose your session</legend><p class="field-help">All times are Pacific Time. Sessions are in person.</p>{% if slots %}<div class="slot-grid">{% for slot in slots %}<label class="choice slot-choice"><input type="radio" name="slot" value="{{ slot.pk }}" {% if form.slot.value|stringformat:'s' == slot.pk|stringformat:'s' %}checked{% endif %} required><span><strong>{{ slot.starts_at|date:'D, M j' }}</strong><span>{{ slot.starts_at|date:'g:i A' }} · {{ slot.duration_minutes }} min</span></span></label>{% endfor %}</div>{% else %}<div class="empty-state"><h3>No sessions available right now</h3><p>Please check back after the coordinator adds more times.</p></div>{% endif %}</fieldset>
+      <fieldset><legend><span class="step-num">3</span>A little about you</legend><p class="form-label" id="booking-for-label">Who are you booking for?</p><div class="inline-options" role="group" aria-labelledby="booking-for-label">{% for radio in form.booking_for %}<label class="choice">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>{% endfor %}</div><div class="field"><label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>{{ form.name }}</div><div class="field"><label for="{{ form.contact.id_for_label }}">{{ form.contact.label }}</label>{{ form.contact }}<p class="field-help">Visible only to the coordinator. This prototype does not send messages.</p></div></fieldset>
+      <p class="privacy-note"><svg class="icon"><use href="#i-heart"/></svg> For this local demo, please use fictional details.</p>
+      <button class="button full-width" type="submit" {% if not slots %}disabled{% endif %}>Book my free session <svg class="icon"><use href="#i-arrow"/></svg></button>
+    </form>
+    <aside class="booking-aside"><span class="aside-spark">✳</span><h2>A little preparation.<br>A lovely start.</h2><div class="aside-detail"><svg class="icon"><use href="#i-pin"/></svg><div><strong>Maple Community Center</strong><p>{{ category.location }}<br>Fictional demo venue</p></div></div><div class="aside-detail"><svg class="icon"><use href="#i-clock"/></svg><div><strong>30 minutes, at your pace</strong><p>{{ category.session_note }}</p></div></div><div class="aside-detail"><svg class="icon"><use href="#i-{{ category.icon }}"/></svg><div><strong>{{ category.preparation }}</strong><p>{{ category.preparation_note }}</p></div></div><div class="aside-note">These sessions start at the community center. Keep passwords and private account details to yourself. Home visits and personal care are outside this demo.</div></aside>
+  </div>
+</div>
+{% endblock %}

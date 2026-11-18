@@ -1,0 +1,184 @@
+import uuid
+from django.core.validators import RegexValidator
+from django.db import models
+
+SUPPORT_CATEGORIES = {
+    'companionship': {
+        'label': 'Companionship', 'icon': 'heart', 'color': 'green',
+        'description': 'A friendly chat, a gentle walk, or a game together.',
+        'topics': [('chat', 'A friendly chat'), ('walk', 'A gentle walk together'), ('games', 'A board game together')],
+        'preparation': 'Just bring yourself',
+        'preparation_note': 'For a walk, meet your helper at the center’s welcome desk. Choose a pace and route you are comfortable with.',
+        'location': 'Community lounge · Meet at the welcome desk',
+        'session_note': 'Time to talk, enjoy a shared activity, and get to know a neighbor.',
+    },
+    'everyday': {
+        'label': 'Everyday help', 'icon': 'hands', 'color': 'peach',
+        'description': 'Plan errands, organize a small task, or read an everyday letter together.',
+        'topics': [('errands', 'Plan everyday errands'), ('organize', 'Organize a small task'), ('letters', 'Read an everyday letter together')],
+        'preparation': 'Bring the task you have in mind',
+        'preparation_note': 'Bring a list or a non-sensitive letter. We’ll work through it together at the center.',
+        'location': 'Community help desk · Meet at the welcome desk',
+        'session_note': 'Practical support with a small everyday task, at the center.',
+    },
+    'technology': {
+        'label': 'Technology help', 'icon': 'phone', 'color': 'lavender',
+        'description': 'Get comfortable with video calls, your phone, and sharing photos.',
+        'topics': [('video', 'Video calls'), ('phone', 'Phone basics'), ('photos', 'Photos & sharing')],
+        'preparation': 'Bring your own device',
+        'preparation_note': 'Your phone or tablet, charged and ready. Your helper will guide you while you stay in control.',
+        'location': 'Learning room · Meet at the welcome desk',
+        'session_note': 'One topic. Plenty of time to learn and practice at your pace.',
+    },
+}
+TOPICS = [topic for category in SUPPORT_CATEGORIES.values() for topic in category['topics']]
+TOPIC_CATEGORY = {topic: key for key, category in SUPPORT_CATEGORIES.items() for topic, _ in category['topics']}
+
+class SessionSlot(models.Model):
+    starts_at = models.DateTimeField(unique=True)
+    venue = models.CharField(max_length=160, default='Maple Community Center')
+    duration_minutes = models.PositiveIntegerField(default=30)
+
+    class Meta:
+        ordering = ['starts_at']
+
+    def __str__(self):
+        from django.utils import timezone
+        return f'{timezone.localtime(self.starts_at):%a, %b %d at %I:%M %p} — {self.venue}'
+
+class Booking(models.Model):
+    class Status(models.TextChoices):
+        BOOKED = 'booked', 'Booked'
+        COMPLETED = 'completed', 'Completed'
+        CANCELLED = 'cancelled', 'Cancelled'
+
+    reference = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    slot = models.ForeignKey(SessionSlot, on_delete=models.PROTECT, related_name='bookings')
+    topic = models.CharField(max_length=20, choices=TOPICS)
+    name = models.CharField(max_length=80)
+    contact = models.CharField(max_length=120, blank=True)
+    booking_for = models.CharField(max_length=12, choices=[('self', 'Myself'), ('someone', 'Someone else')], default='self')
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.BOOKED)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    is_sample = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['slot__starts_at']
+        constraints = [models.UniqueConstraint(
+            fields=['slot'], condition=models.Q(status__in=['booked', 'completed']),
+            name='one_active_booking_per_slot',
+        )]
+
+    def __str__(self):
+        return f'{self.name} — {self.get_topic_display()}'
+
+    @property
+    def support_category(self):
+        return TOPIC_CATEGORY[self.topic]
+
+    @property
+    def support_details(self):
+        return SUPPORT_CATEGORIES[self.support_category]
+
+
+class ServiceCredential(models.Model):
+    """Private link to a booking; public proof contains only blockchain identifiers."""
+    booking = models.OneToOneField(Booking, on_delete=models.PROTECT, related_name='credential')
+    public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    volunteer_alias = models.CharField(max_length=80)
+    volunteer_wallet = models.CharField(max_length=42, validators=[RegexValidator(r'^0x[0-9a-fA-F]{40}$', 'Enter an EVM wallet address.')])
+    issuer_wallet = models.CharField(max_length=42)
+    contract_address = models.CharField(max_length=42)
+    chain_id = models.PositiveIntegerField(default=5042002)
+    status = models.CharField(max_length=20, default='draft', choices=[
+        ('draft', 'Not submitted'), ('pending', 'Issuance pending'), ('issued', 'Issued'),
+        ('revoke_pending', 'Revocation pending'), ('revoked', 'Revoked'), ('failed', 'Transaction failed'),
+    ])
+    issue_tx = models.CharField(max_length=66, blank=True)
+    revoke_tx = models.CharField(max_length=66, blank=True)
+    issue_raw = models.TextField(blank=True, editable=False)
+    revoke_raw = models.TextField(blank=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def chain_uid(self):
+        return '0x' + self.public_id.hex.rjust(64, '0')
+
+    def __str__(self):
+        return f'Service credential {self.public_id}'
+
+
+class CommunityPost(models.Model):
+    slug = models.SlugField(unique=True, max_length=100)
+    kind = models.CharField(max_length=12, choices=[('event', 'Activity'), ('notice', 'Announcement')])
+    title = models.CharField(max_length=100)
+    body = models.TextField(max_length=2500)
+    starts_at = models.DateTimeField(null=True, blank=True)
+    location = models.CharField(max_length=160, default='Maple Community Center')
+    capacity = models.PositiveSmallIntegerField(default=12)
+    going_count = models.PositiveIntegerField(default=0, editable=False)
+    published = models.BooleanField(default=True)
+    is_sample = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def places_left(self):
+        return max(0, self.capacity - self.going_count)
+
+    def __str__(self):
+        return self.title
+
+
+class CommunityAttendance(models.Model):
+    event = models.ForeignKey(CommunityPost, on_delete=models.CASCADE, related_name='attendees')
+    owner_token = models.CharField(max_length=64, editable=False)
+    display_name = models.CharField(max_length=60)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['event', 'owner_token'], name='one_event_place_per_device')]
+
+
+class PhotoAlbum(models.Model):
+    slug = models.SlugField(unique=True)
+    title = models.CharField(max_length=80)
+    description = models.CharField(max_length=300)
+    color = models.CharField(max_length=12, default='lavender', choices=[('lavender', 'Lavender'), ('green', 'Green'), ('peach', 'Peach')])
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+
+class CommunityPhoto(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    album = models.ForeignKey(PhotoAlbum, on_delete=models.PROTECT, related_name='photos')
+    title = models.CharField(max_length=90)
+    caption = models.CharField(max_length=500, blank=True)
+    image_description = models.CharField(max_length=250)
+    uploader_name = models.CharField(max_length=60)
+    owner_token = models.CharField(max_length=64, editable=False)
+    image_data = models.BinaryField(editable=False)
+    width = models.PositiveIntegerField()
+    height = models.PositiveIntegerField()
+    status = models.CharField(max_length=10, default='pending', choices=[('pending', 'Awaiting review'), ('approved', 'Shared'), ('hidden', 'Removed')])
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title
+
+
+class PhotoReport(models.Model):
+    photo = models.ForeignKey(CommunityPhoto, on_delete=models.CASCADE, related_name='reports')
+    owner_token = models.CharField(max_length=64, editable=False)
+    reason = models.CharField(max_length=20, choices=[('privacy', 'Privacy or permission'), ('content', 'Inappropriate photo'), ('other', 'Something else')])
+    resolved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['photo', 'owner_token'], name='one_photo_report_per_device')]

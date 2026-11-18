@@ -1,0 +1,44 @@
+:root { font-size: calc(100% * var(--text-scale, 1)); }
+.display-settings { flex-wrap: wrap; }
+.text-size-controls { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-right: auto; }
+.text-size-controls[hidden] { display: none; }
+.text-size-controls button { font: inherit; font-weight: 600; min-width: 48px; min-height: 48px; padding: 8px 12px; border: 1px solid var(--control-border); border-radius: 9px; color: var(--ink); background: var(--white); }
+.text-size-controls button:hover:not(:disabled) { border-color: var(--purple); background: var(--lavender); }
+.text-size-controls button:disabled { opacity: .5; cursor: default; }
+.text-size-controls output { min-width: 3.1em; text-align: center; font-variant-numeric: tabular-nums; }
+.text-size-label { margin-right: 4px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+/* Enlarged content reflows instead of disappearing behind fixed widths. */
+.site-header, .site-header nav, .voice-guide-heading, .dashboard-heading { flex-wrap: wrap; }
+.site-header nav { max-width: 100%; }
+.brand { white-space: normal; }
+h1, h2, h3, p, label, legend, a, button, output { overflow-wrap: anywhere; }
+.button, .choice { max-width: 100%; }
+.booking-row { flex-wrap: wrap; }
+.topic-card, .stats-grid > div, .support-selector > a { min-width: 0; }
+html[data-text-size="150"] .booking-layout,
+html[data-text-size="175"] .booking-layout,
+html[data-text-size="200"] .booking-layout { grid-template-columns: minmax(0, 1fr); }
+html[data-text-size="150"] .booking-aside,
+html[data-text-size="175"] .booking-aside,
+html[data-text-size="200"] .booking-aside { position: static; }
+html[data-text-size="175"] .support-selector,
+html[data-text-size="200"] .support-selector { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 760px) {
+  .text-size-controls { width: 100%; justify-content: flex-start; }
+  html[data-text-size="150"] .slot-grid,
+  html[data-text-size="175"] .slot-grid,
+  html[data-text-size="200"] .slot-grid,
+  html[data-text-size="175"] .stats-grid,
+  html[data-text-size="200"] .stats-grid,
+  html[data-text-size="175"] .guide-buttons,
+  html[data-text-size="200"] .guide-buttons { grid-template-columns: minmax(0, 1fr); }
+  html[data-text-size="175"] .inline-options,
+  html[data-text-size="200"] .inline-options { flex-direction: column; }
+}
+@media print {
+  :root { font-size: 100%; }
+  .display-settings { display: none; }
+}
+
+.hero-art { overflow: clip; }
