@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.core.management import call_command
 from booking.models import NeighborArea, NeighborProfile
 
 
@@ -6,6 +7,7 @@ class Command(BaseCommand):
     help = 'Seed example California areas and clearly fictional neighbor profiles. Never overwrites real profiles.'
 
     def handle(self, *args, **options):
+        call_command('import_us_areas', stdout=self.stdout)
         areas = [
             ('ontario-ca', 'Ontario, California', 34.06, -117.65),
             ('upland-ca', 'Upland, California', 34.10, -117.65),
@@ -19,7 +21,9 @@ class Command(BaseCommand):
         ]
         saved = []
         for slug, name, lat, lng in areas:
-            area, _ = NeighborArea.objects.get_or_create(slug=slug, defaults={'name': name, 'latitude': lat, 'longitude': lng})
+            area = NeighborArea.objects.filter(name=name).first()
+            if area is None:
+                area = NeighborArea.objects.create(slug=slug, name=name, latitude=lat, longitude=lng, state='CA')
             saved.append(area)
         for n, (nickname, interest, about) in enumerate(samples):
             NeighborProfile.objects.get_or_create(owner_token=f'fictional-neighbor-{n}', defaults={

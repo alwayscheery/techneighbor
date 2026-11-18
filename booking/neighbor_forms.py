@@ -1,9 +1,19 @@
 from django import forms
 from .models import NeighborArea, NeighborProfile, NeighborIntroduction
+from .area_catalog import STATE_CHOICES
 
 
 class NeighborProfileForm(forms.ModelForm):
     permission = forms.BooleanField(label='I agree to share my nickname, general area, interest, and introduction publicly after coordinator approval. I have left out home addresses and contact details.')
+
+    def __init__(self, *args, area_choices=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        selected_id = self.data.get('area') if self.is_bound else (self.instance.area_id if self.instance.pk else None)
+        ids = [area.pk for area in (area_choices or [])]
+        if selected_id and str(selected_id).isdigit():
+            ids.append(int(selected_id))
+        self.fields['area'].queryset = NeighborArea.objects.filter(pk__in=ids)
+        self.fields['area'].empty_label = 'Search above, then choose your city'
 
     class Meta:
         model = NeighborProfile
@@ -25,6 +35,7 @@ class NeighborIntroductionForm(forms.ModelForm):
 
 
 class NeighborAreaForm(forms.Form):
+    state = forms.ChoiceField(choices=[('', 'Other / not specified')] + STATE_CHOICES, required=False)
     slug = forms.SlugField(max_length=50)
     name = forms.CharField(max_length=100, help_text='Use a city or broad neighborhood, never a home address.')
     latitude = forms.FloatField(min_value=-85, max_value=85, help_text='Public area center only. Do not enter a resident’s coordinates.')

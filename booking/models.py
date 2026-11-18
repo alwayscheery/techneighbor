@@ -185,6 +185,7 @@ class PhotoReport(models.Model):
 
 
 class NeighborArea(models.Model):
+    state = models.CharField(max_length=2, blank=True, db_index=True)
     slug = models.SlugField(unique=True)
     name = models.CharField(max_length=100)
     latitude = models.FloatField()

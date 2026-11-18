@@ -4,7 +4,7 @@ from django.http import HttpResponseNotFound, HttpResponse
 from django.core.cache import cache
 
 UUID = r'[0-9a-fA-F-]{36}'
-PUBLIC_GET = re.compile(rf'^(?:/|/neighbors/(?:profile/|{UUID}/introduce/)?|/learn/(?:[a-z-]+/)?|/book/|/booking/{UUID}/|/credentials/{UUID}/(?:proof\.json)?)$')
+PUBLIC_GET = re.compile(rf'^(?:/|/neighbors/(?:areas/|profile/|{UUID}/introduce/)?|/learn/(?:[a-z-]+/)?|/book/|/booking/{UUID}/|/credentials/{UUID}/(?:proof\.json)?)$')
 PUBLIC_POST = re.compile(rf'^(?:/neighbors/(?:profile/|{UUID}/introduce/)|/book/|/voice/audio/|/booking/{UUID}/cancel/)$')
 COMMUNITY_GET = re.compile(rf'^/community/(?:|albums/|albums/[a-zA-Z0-9_-]+/|events/[a-zA-Z0-9_-]+/|photos/upload/|photos/{UUID}/(?:image/)?)$')
 COMMUNITY_POST = re.compile(rf'^/community/(?:photos/upload/|events/[a-zA-Z0-9_-]+/attendance/|photos/{UUID}/action/)$')

@@ -23,6 +23,7 @@ urlpatterns = [
     path('learn/', community_views.learn, name='learn'),
     path('learn/<slug:lesson>/', community_views.learn, name='lesson'),
     path('neighbors/', neighbor_views.directory, name='neighbors'),
+    path('neighbors/areas/', neighbor_views.area_search, name='neighbor_area_search'),
     path('neighbors/profile/', neighbor_views.my_profile, name='neighbor_profile'),
     path('neighbors/<uuid:neighbor_id>/introduce/', neighbor_views.introduce, name='neighbor_introduce'),
     path('coordinator/neighbors/', neighbor_views.moderate, name='neighbor_review'),
