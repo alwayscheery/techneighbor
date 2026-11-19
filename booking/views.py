@@ -40,7 +40,7 @@ def confirmation(request, reference):
     booking = get_object_or_404(Booking.objects.select_related('slot'), reference=reference)
     response = render(request, 'confirmation.html', {'booking': booking})
     response['Cache-Control'] = 'no-store'
-    response['Referrer-Policy'] = 'no-referrer'
+    response['Referrer-Policy'] = 'same-origin'
     response['X-Robots-Tag'] = 'noindex, nofollow'
     return response
 

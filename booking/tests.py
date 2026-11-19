@@ -82,6 +82,21 @@ class BookingWorkflowTests(TestCase):
         booking = self.make_booking()
         self.assertEqual(csrf_client.post(reverse('cancel_booking', args=[booking.reference])).status_code, 403)
 
+    def test_https_confirmation_allows_same_origin_cancellation(self):
+        booking = self.make_booking()
+        client = Client(enforce_csrf_checks=True)
+        confirmation_url = reverse('confirmation', args=[booking.reference])
+        page = client.get(confirmation_url, secure=True)
+        self.assertEqual(page.headers['Referrer-Policy'], 'same-origin')
+        response = client.post(
+            reverse('cancel_booking', args=[booking.reference]),
+            {'csrfmiddlewaretoken': client.cookies['csrftoken'].value},
+            secure=True, HTTP_REFERER='https://testserver' + confirmation_url,
+        )
+        self.assertEqual(response.status_code, 302)
+        booking.refresh_from_db()
+        self.assertEqual(booking.status, 'cancelled')
+
     def test_name_is_html_escaped(self):
         self.client.post(reverse('book'), {**self.payload, 'name': '<script>alert(1)</script>'})
         booking = Booking.objects.get()

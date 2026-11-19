@@ -4,7 +4,7 @@ A Python/Django consumer app helping older adults book companionship, everyday h
 
 ## Hackathon submission hosting
 
-Render + Neon deployment files are included. See [HOSTING.md](HOSTING.md) for the free demo configuration, persistent PostgreSQL storage, private environment settings, and remaining account/deployment steps. Adding the files does not itself deploy the website.
+Live judging demo: **https://techneighbor-hackathon.onrender.com/**. It runs on free Render hosting with persistent Neon PostgreSQL storage and works while the developer’s Mac is off. The free web service sleeps after inactivity; allow about a minute for the first visit to wake it. See [HOSTING.md](HOSTING.md) for setup and how to stop the demo after judging.
 
 ## Run locally
 

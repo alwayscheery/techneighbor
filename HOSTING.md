@@ -1,6 +1,6 @@
 # Host a TechNeighbor hackathon demo
 
-This configuration creates a public hackathon demonstration URL that runs without the developer’s Mac. It uses a free Render Python web service and an external persistent Neon PostgreSQL database. The website is **not deployed merely by adding these files**: sign-in, environment settings, and a successful deployment are still required.
+This configuration creates a public hackathon demonstration URL that runs without the developer’s Mac. It uses a free Render Python web service and an external persistent Neon PostgreSQL database. The deployed judging demo is **https://techneighbor-hackathon.onrender.com/**. The instructions below document the setup for recreation and maintenance.
 
 ## What is prepared
 
