@@ -34,8 +34,6 @@ def audio_for(prompt):
     if prompt not in PROMPTS:
         raise VoiceError('Choose one of the available guide steps.')
     config = elevenlabs_settings()
-    if not config['api_key']:
-        raise VoiceError('Spoken guidance is not connected yet. A coordinator can connect ElevenLabs in Integration setup. You can still use all of the written steps.')
     if not re.fullmatch(r'[A-Za-z0-9_-]{10,80}', config['voice_id']):
         raise VoiceError('The configured voice is not valid. Ask your coordinator to check Integration setup.')
     text = PROMPTS[prompt]
@@ -45,8 +43,15 @@ def audio_for(prompt):
     path = folder / (key + '.mp3')
     if path.exists():
         return path.read_bytes()
-    if getattr(settings, 'PUBLIC_PHONE_DEMO', False):
+    if getattr(settings, 'HOSTED_APP', False):
+        from .models import HostedGuideAudio
+        saved = HostedGuideAudio.objects.filter(cache_key=key).first()
+        if saved:
+            return bytes(saved.audio_data)
+    if getattr(settings, 'PUBLIC_PHONE_DEMO', False) or getattr(settings, 'VOICE_CACHE_ONLY', False):
         raise VoiceError('This demo clip is not available right now. The written steps remain available.')
+    if not config['api_key']:
+        raise VoiceError('Spoken guidance is not connected yet. A coordinator can connect ElevenLabs in Integration setup. You can still use all of the written steps.')
     try:
         response = requests.post(
             f"https://api.elevenlabs.io/v1/text-to-speech/{config['voice_id']}",

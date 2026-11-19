@@ -29,7 +29,7 @@
   <symbol id="i-hands" viewBox="0 0 24 24"><path d="m3 14 4-3 4 3h5c3 0 3 3 0 3h-5m-8-3v6h11l7-6c2-2 0-4-2-2l-3 2M9 5l3-3 3 3v4H9Z"/></symbol>
   <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
 </svg>
-<div class="demo-bar">{% if request.phone_demo %}Temporary phone demo · Please use fictional details{% else %}A local prototype · Fictional community center & sample sessions{% endif %}</div>
+<div class="demo-bar">{% if request.phone_demo %}Temporary phone demo · Please use fictional details{% else %}{% if hosted_mode %}Public demo · Fictional community center & sample sessions{% else %}A local prototype · Fictional community center & sample sessions{% endif %}{% endif %}</div>
 <div class="wrap display-settings" role="group" aria-label="Display settings">
   <div id="text-size-controls" class="text-size-controls" role="group" aria-label="Text size" hidden>
     <span class="text-size-label">Text size</span>
@@ -55,7 +55,7 @@
     <a href="{% url 'community_albums' %}" class="community-nav">Photo albums</a>
     <a href="{% url 'learn' %}" class="community-nav">Spoken lessons</a>
     <a href="{% url 'home' %}#how-it-works" class="nav-secondary">How it works</a>
-    {% if user.is_staff %}<a href="{% url 'dashboard' %}" class="nav-secondary">Coordinator</a><a href="{% url 'integration_setup' %}" class="nav-secondary">Integration setup</a><a href="{% url 'community_moderation' %}" class="nav-secondary">Community review</a><a href="{% url 'neighbor_review' %}" class="nav-secondary">Neighbor review</a>{% endif %}
+    {% if user.is_staff %}<a href="{% url 'dashboard' %}" class="nav-secondary">Coordinator</a>{% if issuer_tools_enabled %}<a href="{% url 'integration_setup' %}" class="nav-secondary">Integration setup</a>{% endif %}<a href="{% url 'community_moderation' %}" class="nav-secondary">Community review</a><a href="{% url 'neighbor_review' %}" class="nav-secondary">Neighbor review</a>{% endif %}
     <a href="{% url 'book' %}" class="button button-small">Find some help <svg class="icon"><use href="#i-arrow"/></svg></a>
   </nav>
 </header>

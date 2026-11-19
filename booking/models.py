@@ -222,3 +222,10 @@ class NeighborIntroduction(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['requester', 'neighbor'], condition=models.Q(status='pending'), name='one_pending_neighbor_introduction')]
+
+
+class HostedGuideAudio(models.Model):
+    """Only pre-generated fixed guide clips; never API keys or resident speech."""
+    cache_key = models.CharField(max_length=64, primary_key=True)
+    prompt = models.CharField(max_length=40)
+    audio_data = models.BinaryField(editable=False)

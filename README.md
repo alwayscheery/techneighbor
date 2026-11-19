@@ -2,6 +2,10 @@
 
 A Python/Django consumer app helping older adults book companionship, everyday help, and technology support through one community center. Arc Testnet provides portable volunteer service credentials. ElevenLabs powers a guided listening path through booking.
 
+## Hackathon submission hosting
+
+Render + Neon deployment files are included. See [HOSTING.md](HOSTING.md) for the free demo configuration, persistent PostgreSQL storage, private environment settings, and remaining account/deployment steps. Adding the files does not itself deploy the website.
+
 ## Run locally
 
 Python 3.12 or newer:
@@ -122,7 +126,7 @@ python manage.py check
 python manage.py test
 ```
 
-The 77 passing tests include upload validation, metadata removal, pending-photo privacy, approval, removal, reports, CSRF, reservation capacity, and cross-database phone moderation. Neighbor tests cover profile consent/privacy, approval and withdrawal, area/interest filtering, private and deduplicated introductions, request limits, Google URL encoding, Maps key setup permissions, and phone-demo route restrictions. Catalog tests cover all 50 states/DC, import repeatability, legacy profile preservation, repeated city names, city selection in profiles, and bounded nationwide search responses. The tests also execute real compiled Solidity bytecode in a local PyEVM Ethereum test engine and cover issuer permissions, duplicate IDs, revocation, privacy, public verification, outages, CSRF and the ElevenLabs API request shape. Local EVM tests are not a replacement for testing Arc-specific runtime differences. Public Arc Testnet issuance and revocation were also exercised against the deployment above. Provider request tests use a mock ElevenLabs response. Separately, all 15 guide and lesson clips were generated through the actual ElevenLabs API, and browser playback plus slower reading speed were verified with the configured account. The local demonstration key is restricted to Text to Speech, capped at 3,000 credits per refresh period, and expires November 22, 2026. The key itself is excluded from exports.
+The 83 passing tests include upload validation, metadata removal, pending-photo privacy, approval, removal, reports, CSRF, reservation capacity, and cross-database phone moderation. Neighbor tests cover profile consent/privacy, approval and withdrawal, area/interest filtering, private and deduplicated introductions, request limits, Google URL encoding, Maps key setup permissions, and phone-demo route restrictions. Catalog tests cover all 50 states/DC, import repeatability, legacy profile preservation, repeated city names, city selection in profiles, and bounded nationwide search responses. The tests also execute real compiled Solidity bytecode in a local PyEVM Ethereum test engine and cover issuer permissions, duplicate IDs, revocation, privacy, public verification, outages, CSRF and the ElevenLabs API request shape. Local EVM tests are not a replacement for testing Arc-specific runtime differences. Public Arc Testnet issuance and revocation were also exercised against the deployment above. Provider request tests use a mock ElevenLabs response. Separately, all 15 guide and lesson clips were generated through the actual ElevenLabs API, and browser playback plus slower reading speed were verified with the configured account. The local demonstration key is restricted to Text to Speech, capped at 3,000 credits per refresh period, and expires November 22, 2026. The key itself is excluded from exports.
 
 To rebuild the artifact, install Node.js and `solc@0.8.30`, then run `node contracts/compile.cjs`. Recompilation is not required to run the app. Keep `ServiceCredentials.sol` and its compiled JSON together.
 

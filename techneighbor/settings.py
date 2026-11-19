@@ -3,14 +3,16 @@ import secrets
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 secret_file = BASE_DIR / '.local-secret'
-if not secret_file.exists():
-    try:
-        fd = os.open(secret_file, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-        with os.fdopen(fd, 'w') as f:
-            f.write(secrets.token_urlsafe(48))
-    except FileExistsError:
-        pass
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or secret_file.read_text().strip()
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if not secret_file.exists():
+        try:
+            fd = os.open(secret_file, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            with os.fdopen(fd, 'w') as f:
+                f.write(secrets.token_urlsafe(48))
+        except FileExistsError:
+            pass
+    SECRET_KEY = secret_file.read_text().strip()
 DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 INSTALLED_APPS = [

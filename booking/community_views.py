@@ -109,7 +109,7 @@ def upload_photo(request):
             form.add_error('image', 'Please choose a photo smaller than 8 MB.')
             valid = False
         if valid:
-            limit = 100 if getattr(settings, 'PUBLIC_PHONE_DEMO', False) else 1000
+            limit = getattr(settings, 'PHOTO_UPLOAD_TOTAL_LIMIT', 100 if getattr(settings, 'PUBLIC_PHONE_DEMO', False) else 1000)
             if CommunityPhoto.objects.count() >= limit:
                 form.add_error(None, 'This demo album has reached its photo limit. Please contact the coordinator.')
             elif CommunityPhoto.objects.filter(owner_token=token, status='pending').count() >= 10:

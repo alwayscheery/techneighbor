@@ -2,9 +2,11 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path
 from booking import views
+from booking.hosted import health
 from booking import credential_views
 from booking import community_views, neighbor_views
 urlpatterns = [
+    path('healthz/', health, name='health'),
     path('', views.home, name='home'),
     path('book/', views.book, name='book'),
     path('booking/<uuid:reference>/', views.confirmation, name='confirmation'),

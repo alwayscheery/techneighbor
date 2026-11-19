@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: techneighbor
+    runtime: python
+    plan: free
+    region: oregon
+    repo: https://github.com/alwayscheery/techneighbor
+    branch: main
+    buildCommand: ./build.sh
+    startCommand: ./start.sh
+    healthCheckPath: /healthz/
+    autoDeployTrigger: 'off'
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: techneighbor.settings_hosted
+      - key: DJANGO_SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: coordinator
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false

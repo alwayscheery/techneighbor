@@ -11,6 +11,9 @@ from booking.models import Booking, SessionSlot
 class Command(BaseCommand):
     help = 'Create fictional local demo sessions and a coordinator account; safe to repeat.'
 
+    def add_arguments(self, parser):
+        parser.add_argument('--no-coordinator', action='store_true')
+
     def handle(self, *args, **options):
         tomorrow = timezone.localdate() + timedelta(days=1)
         for day_offset in range(5):
@@ -30,7 +33,7 @@ class Command(BaseCommand):
                 'status': 'completed', 'completed_at': timezone.now(),
             })
         User = get_user_model()
-        if not User.objects.filter(username='coordinator').exists():
+        if not options['no_coordinator'] and not User.objects.filter(username='coordinator').exists():
             password = secrets.token_urlsafe(18)
             User.objects.create_user('coordinator', password=password, is_staff=True, is_superuser=True)
             path = Path(settings.BASE_DIR) / 'LOCAL_ACCESS.txt'
