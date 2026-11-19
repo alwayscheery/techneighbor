@@ -5,7 +5,6 @@
 <p class="eyebrow">A LITTLE THANK YOU. A STRONGER COMMUNITY.</p>
 <h1>Good neighbors.<br>Shared support.</h1>
 <p class="community-intro">Free help for residents. A little thank you for the volunteers who make it happen.</p>
-<p class="fund-network">Arc Testnet · Demonstration funds only · No cash value</p>
 {% if fund.available %}
 <div class="stats-grid fund-stats"><div><span class="eyebrow">AVAILABLE FOR VOLUNTEERS</span><strong>{{ fund.balance|floatformat:2 }}</strong><p>test USDC in the community fund</p></div><div><span class="eyebrow">THANK YOU REWARDS SENT</span><strong>{{ fund.rewarded|floatformat:2 }}</strong><p>test USDC distributed</p></div><div><span class="eyebrow">SESSIONS REWARDED</span><strong>{{ fund.count }}</strong><p>coordinator-approved rewards</p></div></div>
 <p class="field-help">Live balance checked at Arc Testnet block {{ fund.block }}. Funded through {{ fund.funded|floatformat:2 }} test USDC in recorded contributions. Unsolicited transfers may also affect the balance.</p>
