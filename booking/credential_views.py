@@ -27,8 +27,8 @@ class IssueForm(forms.Form):
 
 
 class VoiceSetupForm(forms.Form):
-    api_key = forms.CharField(max_length=300, required=False, label='ElevenLabs API key', widget=forms.PasswordInput(render_value=False, attrs={'autocomplete': 'new-password'}))
-    voice_id = forms.RegexField(regex=r'^[A-Za-z0-9_-]{10,80}$', max_length=80, label='ElevenLabs voice ID')
+    api_key = forms.CharField(max_length=300, required=False, label='Voice service API key', widget=forms.PasswordInput(render_value=False, attrs={'autocomplete': 'new-password'}))
+    voice_id = forms.RegexField(regex=r'^[A-Za-z0-9_-]{10,80}$', max_length=80, label='Voice ID')
 
 
 @staff_required

@@ -57,7 +57,7 @@ def dashboard(request):
     selected = request.GET.get('status', 'booked')
     if selected not in ('booked', 'completed', 'cancelled', 'all'):
         selected = 'booked'
-    bookings = Booking.objects.select_related('slot', 'credential')
+    bookings = Booking.objects.select_related('slot', 'credential', 'reward')
     counts = {status: bookings.filter(status=status).count() for status in ('booked', 'completed', 'cancelled')}
     selected_category = request.GET.get('category', 'all')
     if selected_category in SUPPORT_CATEGORIES:

@@ -14,7 +14,7 @@ from django.core.management import call_command
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory, override_settings
 from booking.hosted import HostedDemoMiddleware, health
-from booking.models import HostedGuideAudio, ServiceCredential
+from booking.models import HostedGuideAudio, ServiceCredential, VolunteerReward
 from booking.voice import PROMPTS, VoiceError, audio_for
 
 SOURCE = Path(settings.BASE_DIR)
@@ -82,6 +82,7 @@ class HostedDeploymentTests(TestCase):
         with TemporaryDirectory() as folder:
             root = Path(folder); (root / 'contracts').mkdir()
             shutil.copyfile(SOURCE / 'contracts/sample-proof.json', root / 'contracts/sample-proof.json')
+            shutil.copyfile(SOURCE / 'contracts/sample-reward.json', root / 'contracts/sample-reward.json')
             with override_settings(BASE_DIR=root, HOSTED_APP=True), patch.dict(os.environ, {'DJANGO_SUPERUSER_PASSWORD': 'Test-only-password-9tZkwP!', 'DJANGO_SUPERUSER_USERNAME': 'coordinator'}):
                 with patch('booking.management.commands.setup_hosted.call_command'):
                     call_command('setup_hosted', stdout=StringIO())
@@ -93,4 +94,5 @@ class HostedDeploymentTests(TestCase):
             self.assertFalse(user.is_superuser)
             self.assertEqual(user.password, password_hash)
             self.assertEqual(ServiceCredential.objects.count(), 1)
+            self.assertEqual(VolunteerReward.objects.count(), 1)
             self.assertFalse((root / 'LOCAL_ACCESS.txt').exists())

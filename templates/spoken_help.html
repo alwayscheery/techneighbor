@@ -1,7 +1,7 @@
 {% load static %}
 <section class="voice-guide" aria-labelledby="voice-guide-heading" data-guide-category="{{ voice_key }}" data-guide-remember="false">
-  <div class="voice-guide-heading"><div><p class="eyebrow">LISTEN AT YOUR PACE · ELEVENLABS</p><h2 id="voice-guide-heading">{{ voice_title }}</h2></div><button type="button" class="button button-outline" id="guide-start">Listen or replay</button></div>
-  <p class="field-help">Only the written instructions below are sent to ElevenLabs. Your photos, captions, names, and form entries are never sent.</p>
+  <div class="voice-guide-heading"><div><p class="eyebrow">LISTEN AT YOUR PACE</p><h2 id="voice-guide-heading">{{ voice_title }}</h2></div><button type="button" class="button button-outline" id="guide-start">Listen or replay</button></div>
+  <p class="field-help">Spoken guidance reads only the written instructions below. Your photos, captions, names, and form entries are never sent.</p>
   <div id="guide-player">
     <p id="guide-transcript" class="guide-transcript">{{ voice_text }}</p>
     <audio id="guide-audio" controls preload="none" aria-label="Spoken help"></audio>

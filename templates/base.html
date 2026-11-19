@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="{% static 'text-size.css' %}?v=20261116-text">
   <link rel="stylesheet" href="{% static 'community.css' %}?v=20261116-community">
 <link rel="stylesheet" href="{% static 'neighbors.css' %}">
+<link rel="stylesheet" href="{% static 'rewards.css' %}">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -54,6 +55,7 @@
     <a href="{% url 'neighbors' %}" class="community-nav">Nearby neighbors</a>
     <a href="{% url 'community_albums' %}" class="community-nav">Photo albums</a>
     <a href="{% url 'learn' %}" class="community-nav">Spoken lessons</a>
+    <a href="{% url 'community_fund' %}" class="community-nav">Community fund</a>
     <a href="{% url 'home' %}#how-it-works" class="nav-secondary">How it works</a>
     {% if user.is_staff %}<a href="{% url 'dashboard' %}" class="nav-secondary">Coordinator</a>{% if issuer_tools_enabled %}<a href="{% url 'integration_setup' %}" class="nav-secondary">Integration setup</a>{% endif %}<a href="{% url 'community_moderation' %}" class="nav-secondary">Community review</a><a href="{% url 'neighbor_review' %}" class="nav-secondary">Neighbor review</a>{% endif %}
     <a href="{% url 'book' %}" class="button button-small">Find some help <svg class="icon"><use href="#i-arrow"/></svg></a>

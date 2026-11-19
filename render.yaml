@@ -21,3 +21,5 @@ services:
         value: coordinator
       - key: DJANGO_SUPERUSER_PASSWORD
         sync: false
+      - key: ARC_REWARD_PRIVATE_KEY
+        sync: false

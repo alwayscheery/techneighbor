@@ -1,0 +1,10 @@
+{
+  "owner": "0xb311D3e025270af9e6c3C78BCAB230BEe98B7321",
+  "operator": "0x4BBfA0c31CEC833B03bE3F8E309f57457BFad357",
+  "contract": "0xA8eC5DF0E2a9c15266f4d8025a2aAFC2f9918b97",
+  "chain_id": 5042002,
+  "deploy_tx": "0x4a4b5f196eb259c45c47e6d2f2bb9fe11ecd955281eea4541d7fb08b02f9b929",
+  "fund_tx": "0x9f5712d483dc5df0bc6590a2909b53fa9a440813a75c9ed18950c0369bd3b81e",
+  "operator_gas_tx": "0xc618633179300678ba84919fc26d31bd006457ec71cacfd8b0287e1de5c61a3c",
+  "network": "Arc Testnet"
+}

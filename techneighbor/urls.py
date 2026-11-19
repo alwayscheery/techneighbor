@@ -3,9 +3,13 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from booking import views
 from booking.hosted import health
-from booking import credential_views
+from booking import credential_views, reward_views
 from booking import community_views, neighbor_views
 urlpatterns = [
+    path('community/fund/', reward_views.community_fund, name='community_fund'),
+    path('coordinator/booking/<uuid:reference>/reward/', reward_views.approve, name='approve_reward'),
+    path('rewards/<uuid:public_id>/', reward_views.receipt, name='reward_receipt'),
+    path('coordinator/rewards/<uuid:public_id>/pay/', reward_views.pay, name='pay_reward'),
     path('healthz/', health, name='health'),
     path('', views.home, name='home'),
     path('book/', views.book, name='book'),

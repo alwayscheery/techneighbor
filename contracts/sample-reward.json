@@ -1,0 +1,9 @@
+{
+  "network": "Arc Testnet",
+  "chain_id": 5042002,
+  "contract": "0xA8eC5DF0E2a9c15266f4d8025a2aAFC2f9918b97",
+  "public_id": "cc5ab4cb-a6ee-444a-aba0-66b546655c56",
+  "volunteer_wallet": "0xCD69a0a943B7931d7390c8B9853Edb2346B244fA",
+  "transaction_hash": "0x66f6a21c11e388e73d047e4091c7e7f8c8d2aa710563f4ef21b24b8d60c1fd36",
+  "amount": "2"
+}

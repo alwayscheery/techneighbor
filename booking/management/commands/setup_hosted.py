@@ -8,7 +8,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
-from booking.models import Booking, ServiceCredential, SessionSlot
+from booking.models import Booking, ServiceCredential, SessionSlot, VolunteerReward
 
 
 class Command(BaseCommand):
@@ -38,4 +38,13 @@ class Command(BaseCommand):
                 volunteer_alias='Demo volunteer', volunteer_wallet=proof['volunteer_wallet'],
                 issuer_wallet=proof['issuer_wallet'], contract_address=proof['contract_address'],
                 chain_id=proof['chain_id'], status='issued', issue_tx=proof['issue_transaction'])
+        reward_sample = settings.BASE_DIR / 'contracts' / 'sample-reward.json'
+        if reward_sample.exists():
+            sample = json.loads(reward_sample.read_text())
+            if not VolunteerReward.objects.filter(public_id=sample['public_id']).exists():
+                slot, _ = SessionSlot.objects.get_or_create(starts_at=timezone.now()-timedelta(days=4))
+                demo_booking = Booking.objects.create(slot=slot, name='Fictional reward demonstration', topic='video', status='completed', is_sample=True, completed_at=timezone.now())
+                VolunteerReward.objects.create(booking=demo_booking, public_id=sample['public_id'],
+                    volunteer_wallet=sample['volunteer_wallet'], transaction_hash=sample['transaction_hash'],
+                    status='paid', approved_by=User.objects.get(username=username))
         self.stdout.write('Hosted demo initialized. Private local records and signing keys were not imported.')

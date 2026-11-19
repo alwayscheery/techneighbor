@@ -51,7 +51,7 @@ def audio_for(prompt):
     if getattr(settings, 'PUBLIC_PHONE_DEMO', False) or getattr(settings, 'VOICE_CACHE_ONLY', False):
         raise VoiceError('This demo clip is not available right now. The written steps remain available.')
     if not config['api_key']:
-        raise VoiceError('Spoken guidance is not connected yet. A coordinator can connect ElevenLabs in Integration setup. You can still use all of the written steps.')
+        raise VoiceError('Spoken guidance is not connected yet. A coordinator can connect the voice service in Integration setup. You can still use all of the written steps.')
     try:
         response = requests.post(
             f"https://api.elevenlabs.io/v1/text-to-speech/{config['voice_id']}",
@@ -62,7 +62,7 @@ def audio_for(prompt):
     except requests.RequestException as exc:
         raise VoiceError('The voice service could not be reached. Please try again, or follow the written steps.') from exc
     if response.status_code != 200 or not response.headers.get('Content-Type', '').startswith('audio/'):
-        raise VoiceError('ElevenLabs could not produce the guide audio. Ask your coordinator to check the API key, voice access, and available credits.')
+        raise VoiceError('The voice service could not produce the guide audio. Ask your coordinator to check the API key, voice access, and available credits.')
     if len(response.content) > 5_000_000:
         raise VoiceError('The voice response was too large. Please use the written steps.')
     path.write_bytes(response.content)

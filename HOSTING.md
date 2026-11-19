@@ -64,3 +64,8 @@ Supply the private database URL and stable hosted secret through environment var
 Render’s free service sleeps after 15 idle minutes, so the first visit can take about a minute to wake. This is a stable hosted demo address, not an uptime guarantee or production care service. Keep the provider accounts active and maintain private database backups before collecting real community data.
 
 The intended lifetime is submission and judging. No custom domain or paid plan is required. The owner can suspend the web service or remove the demo resources after judging; this setup does not promise indefinite hosting.
+
+
+### Optional test-only reward signer
+
+`ARC_REWARD_PRIVATE_KEY` connects the separate operator in `contracts/reward-deployment.json`. Add only the new reward operator key, never the credential issuer’s key. Without it, approval and public verification work but the receipt states that payments are not connected. The fund uses only free Arc Testnet tokens; it pays 2 per approved receipt with a ten-reward UTC daily contract limit. The existing credential signing routes stay disabled on hosted deployments. Remove this environment setting to disable reward signing.

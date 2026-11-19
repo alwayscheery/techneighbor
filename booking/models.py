@@ -109,6 +109,25 @@ class ServiceCredential(models.Model):
         return f'Service credential {self.public_id}'
 
 
+class VolunteerReward(models.Model):
+    """Only random public_id, recipient, amount and transaction are published."""
+    booking = models.OneToOneField(Booking, on_delete=models.PROTECT, related_name='reward')
+    public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    volunteer_wallet = models.CharField(max_length=42)
+    approved_by = models.ForeignKey('auth.User', on_delete=models.PROTECT)
+    approved_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=12, default='approved', choices=[
+        ('approved', 'Approved, not paid'), ('pending', 'Awaiting confirmation'),
+        ('paid', 'Paid on Arc Testnet'), ('failed', 'Transaction failed'),
+    ])
+    transaction_hash = models.CharField(max_length=66, blank=True, unique=True, null=True)
+    signed_transaction = models.TextField(blank=True, editable=False)
+
+    @property
+    def chain_uid(self):
+        return '0x' + self.public_id.hex.rjust(64, '0')
+
+
 class CommunityPost(models.Model):
     slug = models.SlugField(unique=True, max_length=100)
     kind = models.CharField(max_length=12, choices=[('event', 'Activity'), ('notice', 'Announcement')])
