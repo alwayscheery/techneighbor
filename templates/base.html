@@ -29,7 +29,7 @@
   <symbol id="i-hands" viewBox="0 0 24 24"><path d="m3 14 4-3 4 3h5c3 0 3 3 0 3h-5m-8-3v6h11l7-6c2-2 0-4-2-2l-3 2M9 5l3-3 3 3v4H9Z"/></symbol>
   <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
 </svg>
-<div class="demo-bar">{% if request.phone_demo %}Temporary phone demo · Please use fictional details{% else %}{% if hosted_mode %}Public demo · Fictional community center & sample sessions{% else %}A local prototype · Fictional community center & sample sessions{% endif %}{% endif %}</div>
+{% if not hosted_mode %}<div class="demo-bar">{% if request.phone_demo %}Temporary phone demo · Please use fictional details{% else %}A local prototype · Fictional community center & sample sessions{% endif %}</div>{% endif %}
 <div class="wrap display-settings" role="group" aria-label="Display settings">
   <div id="text-size-controls" class="text-size-controls" role="group" aria-label="Text size" hidden>
     <span class="text-size-label">Text size</span>
