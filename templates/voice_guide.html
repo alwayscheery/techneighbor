@@ -1,6 +1,6 @@
 {% load static %}
 <section id="spoken-guide" class="voice-guide" aria-labelledby="voice-guide-heading" data-guide-category="{{ selected_category|default:'welcome' }}" data-guide-remember="{% if selected_category %}true{% else %}false{% endif %}">
-  <div class="voice-guide-heading"><div><p class="eyebrow">LISTEN, READ, AND TAKE YOUR TIME</p><h2 id="voice-guide-heading">{% if selected_category == 'confirmation' %}Your next steps, spoken clearly.{% else %}A friendly voice, step by step.{% endif %}</h2></div><button type="button" class="button button-outline" id="guide-start">{% if selected_category == 'confirmation' %}Listen to next steps{% else %}Start spoken guide{% endif %}</button></div>
+  <div class="voice-guide-heading"><div><p class="eyebrow">LISTEN, READ, AND TAKE YOUR TIME</p><h2 id="voice-guide-heading">{% if selected_category == 'confirmation' %}Your next steps, spoken clearly.{% else %}Spoken booking guide{% endif %}</h2></div><button type="button" class="button button-outline" id="guide-start">{% if selected_category == 'confirmation' %}Listen to next steps{% else %}Start spoken guide{% endif %}</button></div>
   <p class="field-help">Listen to the booking instructions at your own pace. Only written guide instructions are sent to the voice service. Your name, contact details, and appointment time are not sent.</p>
   <div id="guide-player" hidden>
     <p id="guide-transcript" class="guide-transcript"></p>

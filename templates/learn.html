@@ -1,8 +1,8 @@
 {% extends 'base.html' %}{% load spoken %}
 {% block title %}Learn at your pace — TechNeighbor{% endblock %}
 {% block content %}<section class="wrap community-detail">
-<p class="eyebrow">A LITTLE PRACTICE. A LITTLE MORE CONFIDENCE.</p>
-{% if selected %}<a class="back-link" href="{% url 'learn' %}">← All spoken lessons</a><h1>{{ selected.1 }}</h1><p class="community-intro">{{ selected.2 }}</p>{% spoken_help selected.0 "One small step at a time." %}<p class="field-help">Apps can look different. If a step does not match your screen, pause and ask a helper.</p>
-{% else %}<h1>Technology,<br>at your pace.</h1><p class="community-intro">Short spoken lessons you can pause, replay, or slow down. Read along as you listen.</p><div class="album-grid">{% for slug, lesson in lessons %}<article class="community-content-card"><p class="eyebrow">SPOKEN LESSON</p><h2>{{ lesson.1 }}</h2><p>{{ lesson.2 }}</p><a class="button button-outline" href="{% url 'lesson' slug %}">Open lesson →</a></article>{% endfor %}</div>{% endif %}
+
+{% if selected %}<a class="back-link" href="{% url 'learn' %}">← All spoken lessons</a><h1>{{ selected.1 }}</h1><p class="community-intro">{{ selected.2 }}</p>{% spoken_help selected.0 "Listen to this lesson" %}<p class="field-help">Apps can look different. If a step does not match your screen, pause and ask a helper.</p>
+{% else %}<h1>Technology lessons</h1><p class="community-intro">Short spoken lessons you can pause, replay, or slow down. Read along as you listen.</p><div class="album-grid">{% for slug, lesson in lessons %}<article class="community-content-card"><p class="eyebrow">SPOKEN LESSON</p><h2>{{ lesson.1 }}</h2><p>{{ lesson.2 }}</p><a class="button button-outline" href="{% url 'lesson' slug %}">Open lesson →</a></article>{% endfor %}</div>{% endif %}
 <p style="margin-top:2rem"><a class="text-link" href="{% url 'book' %}?category=technology">Practice with a friendly helper →</a></p>
 </section>{% endblock %}

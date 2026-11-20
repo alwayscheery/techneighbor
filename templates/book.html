@@ -2,7 +2,7 @@
 {% block title %}Book a free session — TechNeighbor{% endblock %}
 {% block content %}
 <div class="wrap page-layout">
-  <div class="page-intro"><a class="back-link" href="{% url 'home' %}">← Back to home</a><p class="eyebrow">ONE SMALL STEP, TOGETHER</p><h1>Let’s find you<br>a little help.</h1><p>A free, 30-minute session.<br>A friendly person. Time for what matters to you.</p></div>
+  <div class="page-intro"><a class="back-link" href="{% url 'home' %}">← Back to home</a><h1>Book a session</h1><p>Choose your support, pick a time, and enter your details.</p></div>
   {% include 'voice_guide.html' %}
   <nav class="support-selector" aria-label="Choose the kind of support">
     {% for key, details in categories.items %}<a href="{% url 'book' %}?category={{ key }}" {% if selected_category == key %}aria-current="page"{% endif %}><span class="topic-icon {{ details.color }}"><svg class="icon"><use href="#i-{{ details.icon }}"/></svg></span><span><strong>{{ details.label }}</strong><span>{{ details.description }}</span></span></a>{% endfor %}

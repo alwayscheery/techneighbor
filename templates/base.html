@@ -5,7 +5,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Companionship, everyday help, and technology support. A friendly neighbor by your side.">
   <meta name="robots" content="noindex, nofollow">
-  <title>{% block title %}TechNeighbor — A little help goes a long way{% endblock %}</title>
+  <title>{% block title %}TechNeighbor — Community support{% endblock %}</title>
   <script src="{% static 'theme.js' %}"></script>
   <script src="{% static 'text-size.js' %}"></script>
   <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="{% static 'community.css' %}?v=20261116-community">
 <link rel="stylesheet" href="{% static 'neighbors.css' %}">
 <link rel="stylesheet" href="{% static 'rewards.css' %}">
+<link rel="stylesheet" href="{% static 'simple.css' %}">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -49,22 +50,21 @@
   <noscript><span class="theme-no-script">Light mode · Enable JavaScript to change appearance.</span></noscript>
 </div>
 <header class="site-header wrap">
-  <a class="brand" href="{% url 'home' %}" aria-label="TechNeighbor home"><span class="brand-mark" aria-hidden="true">✳</span>TechNeighbor<span class="brand-dot">.</span></a>
+  <a class="brand" href="{% url 'home' %}" aria-label="TechNeighbor home">TechNeighbor</a>
   <nav aria-label="Main navigation">
-    <a href="{% url 'community_hub' %}" class="community-nav">Community hub</a>
-    <a href="{% url 'neighbors' %}" class="community-nav">Nearby neighbors</a>
-    <a href="{% url 'community_albums' %}" class="community-nav">Photo albums</a>
-    <a href="{% url 'learn' %}" class="community-nav">Spoken lessons</a>
-    <a href="{% url 'community_fund' %}" class="community-nav">Community fund</a>
-    <a href="{% url 'home' %}#how-it-works" class="nav-secondary">How it works</a>
-    {% if user.is_staff %}<a href="{% url 'dashboard' %}" class="nav-secondary">Coordinator</a>{% if issuer_tools_enabled %}<a href="{% url 'integration_setup' %}" class="nav-secondary">Integration setup</a>{% endif %}<a href="{% url 'community_moderation' %}" class="nav-secondary">Community review</a><a href="{% url 'neighbor_review' %}" class="nav-secondary">Neighbor review</a>{% endif %}
-    <a href="{% url 'book' %}" class="button button-small">Find some help <svg class="icon"><use href="#i-arrow"/></svg></a>
+    <a href="{% url 'community_hub' %}" class="community-nav" {% if request.resolver_match.url_name == 'community_hub' %}aria-current="page"{% endif %}>Community hub</a>
+    <a href="{% url 'neighbors' %}" class="community-nav" {% if request.resolver_match.url_name == 'neighbors' %}aria-current="page"{% endif %}>Nearby neighbors</a>
+    <a href="{% url 'community_albums' %}" class="community-nav" {% if request.resolver_match.url_name == 'community_albums' %}aria-current="page"{% endif %}>Photo albums</a>
+    <a href="{% url 'learn' %}" class="community-nav" {% if request.resolver_match.url_name == 'learn' %}aria-current="page"{% endif %}>Spoken lessons</a>
+    <a href="{% url 'community_fund' %}" class="community-nav" {% if request.resolver_match.url_name == 'community_fund' %}aria-current="page"{% endif %}>Community fund</a>
+    {% if user.is_staff %}<a href="{% url 'dashboard' %}" class="nav-secondary">Coordinator</a>{% endif %}
+    <a href="{% url 'book' %}" class="button button-small">Book a session <svg class="icon"><use href="#i-arrow"/></svg></a>
   </nav>
 </header>
 {% if messages %}<div class="wrap messages" role="status">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>{% endif %}
 <main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
 <footer class="wrap site-footer">
-  <div><a class="brand footer-brand" href="{% url 'home' %}"><span class="brand-mark" aria-hidden="true">✳</span>TechNeighbor<span class="brand-dot">.</span></a><p>A little support. A familiar face. A stronger community.</p></div>
-  <div class="footer-right"><span>Built around people.</span>{% if not request.phone_demo %}<a href="{% url 'dashboard' %}">Coordinator sign-in <span aria-hidden="true">↗</span></a>{% endif %}</div>
+  <div><a class="brand footer-brand" href="{% url 'home' %}">TechNeighbor</a><p>Community support, in one place.</p></div>
+  <div class="footer-right">{% if not request.phone_demo %}<a href="{% url 'dashboard' %}">Coordinator sign-in <span aria-hidden="true">↗</span></a>{% endif %}</div>
 </footer>
 </body></html>
