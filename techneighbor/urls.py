@@ -1,11 +1,20 @@
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path
-from booking import views, support_views
+from booking import views, support_views, care_views
 from booking.hosted import health
 from booking import credential_views, reward_views
 from booking import community_views, neighbor_views
 urlpatterns = [
+    path('support/circles/<uuid:circle_id>/care/', care_views.home, name='care_home'),
+    path('support/circles/<uuid:circle_id>/care/reviews/', care_views.reviews, name='care_reviews'),
+    path('support/circles/<uuid:circle_id>/care/reviews/<uuid:change_id>/', care_views.review_action, name='care_review_action'),
+    path('support/circles/<uuid:circle_id>/care/access/<int:member_id>/', care_views.permissions, name='care_permissions'),
+    path('support/circles/<uuid:circle_id>/care/record/<uuid:record_id>/action/', care_views.record_action, name='care_record_action'),
+    path('support/circles/<uuid:circle_id>/care/record/<uuid:record_id>/help/', care_views.help_task, name='care_help_task'),
+    path('support/circles/<uuid:circle_id>/care/record/<uuid:record_id>/calendar.ics', care_views.calendar_entry, name='care_calendar'),
+    path('support/circles/<uuid:circle_id>/care/<str:kind>/new/', care_views.edit, name='care_create'),
+    path('support/circles/<uuid:circle_id>/care/<str:kind>/<uuid:record_id>/edit/', care_views.edit, name='care_edit'),
     path('support/', support_views.home, name='support_home'),
     path('support/sign-in/', auth_views.LoginView.as_view(template_name='support/auth.html', next_page='support_home'), name='support_login'),
     path('support/sign-up/', support_views.register, name='support_register'),

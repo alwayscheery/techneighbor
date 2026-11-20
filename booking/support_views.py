@@ -8,6 +8,7 @@ from django.contrib.auth import login, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
+from django.db.models import Q
 from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -17,6 +18,7 @@ from .community_views import owner_token
 from .models import (NeighborProfile, SupportCircle, SupportMember, SupportNeighborIdentity,
                      SupportInvite, SupportTask, SupportActivity)
 from .support_forms import CircleForm, InviteForm, JoinForm, SupportTaskForm
+from .care_access import task_filter, check_task_access
 
 
 def circle_login(view):
@@ -84,13 +86,13 @@ def board(request, circle_id):
     selected = request.GET.get('filter', 'active')
     if selected not in ['active', 'open', 'mine', 'done', 'all']:
         selected = 'active'
-    tasks = circle.tasks.select_related('created_by', 'assignee', 'reward').order_by('due_at', '-created_at')
+    tasks = circle.tasks.filter(task_filter(member)).select_related('created_by', 'assignee', 'reward', 'care_record').order_by('due_at', '-created_at')
     if selected == 'active': tasks = tasks.exclude(status__in=['done', 'cancelled'])
     elif selected == 'open': tasks = tasks.filter(status='open')
     elif selected == 'mine': tasks = tasks.filter(assignee=request.user).exclude(status__in=['done', 'cancelled'])
     elif selected == 'done': tasks = tasks.filter(status='done')
     return render(request, 'support/board.html', {'circle': circle, 'member': member, 'tasks': tasks[:100],
-        'selected': selected, 'activity': circle.activity.select_related('actor').order_by('-created_at')[:20]})
+        'selected': selected, 'activity': circle.activity.filter(Q(task__isnull=True) | Q(task__in=circle.tasks.filter(task_filter(member)))).select_related('actor').order_by('-created_at')[:20]})
 
 
 @circle_login
@@ -98,6 +100,8 @@ def task_form(request, circle_id, task_id=None):
     circle = get_object_or_404(SupportCircle, pk=circle_id)
     member = member_for(request, circle)
     task = get_object_or_404(SupportTask, pk=task_id, circle=circle) if task_id else None
+    if task:
+        check_task_access(member, task)
     if member.role == 'neighbor' or (task and (task.status != 'open' or (circle.owner_id != request.user.pk and task.created_by_id != request.user.pk))):
         raise Http404
     with timezone.override(ZoneInfo(circle.timezone)):
@@ -108,6 +112,8 @@ def task_form(request, circle_id, task_id=None):
                 current_member = member_for(request, circle)
                 if current_member.role == 'neighbor':
                     raise Http404
+                if task:
+                    check_task_access(current_member,task)
                 if circle.tasks.count() >= 250 and task is None:
                     form.add_error(None, 'This circle has reached the demo limit of 250 tasks.')
                 elif task and (not SupportTask.objects.filter(pk=task.pk, status='open').exists()):
@@ -129,8 +135,9 @@ def task_form(request, circle_id, task_id=None):
 def task_action(request, circle_id, task_id):
     with transaction.atomic():
         circle = get_object_or_404(SupportCircle.objects.select_for_update(), pk=circle_id)
-        member_for(request, circle)
+        current_member = member_for(request, circle)
         task = get_object_or_404(SupportTask.objects.select_for_update(), pk=task_id, circle=circle)
+        check_task_access(current_member, task)
         action = request.POST.get('action')
         is_manager = request.user.pk in (circle.owner_id, task.created_by_id)
         if action == 'claim' and task.status == 'open' and task.assignee_id is None:
@@ -164,7 +171,7 @@ def invite(request, circle_id):
                 form.add_error(None, 'You can create up to 20 invitations per day.')
             else:
                 code = secrets.token_urlsafe(24)
-                SupportInvite.objects.create(circle=circle, role=form.cleaned_data['role'],
+                SupportInvite.objects.create(circle=circle, role=form.cleaned_data['role'], care_permissions=form.permissions(),
                     token_hash=hashlib.sha256(code.encode()).hexdigest(), expires_at=timezone.now()+timedelta(hours=48))
                 event(circle, request.user, 'Created a private invitation')
     return render(request, 'support/invite.html', {'circle': circle, 'form': form, 'code': code,
@@ -209,7 +216,7 @@ def join(request):
                                 SupportNeighborIdentity.objects.create(user=request.user, profile=profile)
                     if not form.errors:
                         SupportMember.objects.update_or_create(circle=circle, user=request.user,
-                            defaults={'active': True, 'role': found.role, 'neighbor_profile': profile})
+                            defaults={'active': True, 'role': found.role, 'neighbor_profile': profile, 'care_permissions': found.care_permissions})
                         found.used_by = request.user; found.save(update_fields=['used_by'])
                         event(circle, request.user, 'Joined the circle')
                         return redirect('support_circle', circle_id=circle.pk)
@@ -226,6 +233,7 @@ def members(request, circle_id):
 
 def remove_member(circle, membership, actor):
     membership.active = False; membership.save(update_fields=['active'])
+    circle.care_changes.filter(author=membership.user,status='pending').update(status='rejected',reviewed_by=actor)
     circle.tasks.filter(assignee=membership.user, status__in=['claimed', 'review']).update(status='open', assignee=None)
     event(circle, actor, 'Left the circle' if membership.user_id == actor.pk else 'Removed a circle member')
 
@@ -264,6 +272,7 @@ def archive(request, circle_id):
             return HttpResponseBadRequest('Choose archive or restore.')
         circle.archived = action == 'archive'; circle.save(update_fields=['archived'])
         if circle.archived:
+            circle.care_changes.filter(status='pending').update(status='rejected',reviewed_by=request.user)
             circle.invites.filter(used_by=None).update(revoked=True)
         event(circle, request.user, 'Archived the circle' if circle.archived else 'Restored the circle')
     return redirect('support_home')
@@ -277,6 +286,7 @@ def request_reward(request, circle_id, task_id):
     circle = get_object_or_404(SupportCircle, pk=circle_id)
     member_for(request, circle)
     task = get_object_or_404(SupportTask, pk=task_id, circle=circle, assignee=request.user, status='done')
+    check_task_access(member_for(request,circle),task)
     existing = VolunteerReward.objects.filter(support_task=task).first()
     if existing:
         return redirect('reward_receipt', public_id=existing.public_id)

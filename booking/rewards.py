@@ -168,5 +168,9 @@ def support_task_eligible(task):
     if task.status != 'done' or not task.assignee_id or task.circle.archived:
         return False
     member = SupportMember.objects.filter(circle=task.circle, user_id=task.assignee_id, active=True).select_related('neighbor_profile').first()
+    if member and task.care_record_id:
+        from .care_access import access_level
+        if task.care_record.archived or access_level(member,task.care_record.kind)=='none':
+            return False
     return bool(member and (member.role != 'neighbor' or (member.neighbor_profile and
         member.neighbor_profile.status == 'approved' and not member.neighbor_profile.is_sample)))

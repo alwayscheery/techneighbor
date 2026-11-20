@@ -272,6 +272,7 @@ class SupportMember(models.Model):
     role = models.CharField(max_length=12, choices=[('owner', 'Organizer'), ('family', 'Family member'), ('neighbor', 'Approved neighbor')])
     neighbor_profile = models.ForeignKey(NeighborProfile, on_delete=models.PROTECT, null=True, blank=True)
     active = models.BooleanField(default=True)
+    care_permissions = models.JSONField(default=dict, blank=True)
     joined_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -288,6 +289,7 @@ class SupportInvite(models.Model):
     circle = models.ForeignKey(SupportCircle, on_delete=models.CASCADE, related_name='invites')
     token_hash = models.CharField(max_length=64, unique=True, editable=False)
     role = models.CharField(max_length=12, choices=[('family', 'Family member'), ('neighbor', 'Approved neighbor')])
+    care_permissions = models.JSONField(default=dict, blank=True)
     expires_at = models.DateTimeField()
     used_by = models.ForeignKey('auth.User', on_delete=models.PROTECT, null=True, blank=True)
     revoked = models.BooleanField(default=False)
@@ -297,6 +299,7 @@ class SupportInvite(models.Model):
 class SupportTask(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     circle = models.ForeignKey(SupportCircle, on_delete=models.CASCADE, related_name='tasks')
+    care_record = models.ForeignKey('CareRecord', on_delete=models.PROTECT, null=True, blank=True, related_name='help_tasks')
     created_by = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='support_tasks_created')
     title = models.CharField(max_length=100)
     details = models.TextField(max_length=1000, blank=True)
@@ -312,4 +315,42 @@ class SupportActivity(models.Model):
     actor = models.ForeignKey('auth.User', on_delete=models.PROTECT)
     action = models.CharField(max_length=60)
     task = models.ForeignKey(SupportTask, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+CARE_KINDS = [('appointments', 'Appointments'), ('medications', 'Medications'),
+              ('contacts', 'Care contacts'), ('benefits', 'Benefit renewals')]
+
+
+class CareRecord(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    circle = models.ForeignKey(SupportCircle, on_delete=models.CASCADE, related_name='care_records')
+    kind = models.CharField(max_length=16, choices=CARE_KINDS)
+    encrypted_payload = models.TextField(editable=False)
+    due_at = models.DateTimeField(null=True, blank=True)
+    version = models.PositiveIntegerField(default=1)
+    archived = models.BooleanField(default=False)
+    created_by = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='+')
+    updated_by = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='+')
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class CareChange(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    circle = models.ForeignKey(SupportCircle, on_delete=models.CASCADE, related_name='care_changes')
+    record = models.ForeignKey(CareRecord, on_delete=models.PROTECT, null=True, blank=True)
+    kind = models.CharField(max_length=16, choices=CARE_KINDS)
+    author = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='+')
+    encrypted_payload = models.TextField(editable=False)
+    base_version = models.PositiveIntegerField(default=0)
+    status = models.CharField(max_length=12, default='pending', choices=[('pending', 'Awaiting owner approval'), ('approved', 'Approved'), ('rejected', 'Not approved')])
+    reviewed_by = models.ForeignKey('auth.User', on_delete=models.PROTECT, null=True, blank=True, related_name='+')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class CareActivity(models.Model):
+    circle = models.ForeignKey(SupportCircle, on_delete=models.CASCADE, related_name='care_activity')
+    kind = models.CharField(max_length=16, choices=CARE_KINDS)
+    actor = models.ForeignKey('auth.User', on_delete=models.PROTECT)
+    action = models.CharField(max_length=60)
     created_at = models.DateTimeField(auto_now_add=True)

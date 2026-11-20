@@ -195,3 +195,25 @@ class VolunteerRewardTests(TestCase):
         task.status='done'; task.save(); member.active=False; member.save()
         self.client.post(url); reward.refresh_from_db(); self.assertEqual(reward.status, 'requested')
         self.assertEqual(self.contract.functions.rewardCount().call(), 0)
+
+    def test_care_task_reward_uses_scope_permissions_without_publishing_care_data(self):
+        from .models import CareRecord, SupportCircle, SupportMember, SupportTask
+        from .care_crypto import seal
+        owner=get_user_model().objects.create_user('private-care-owner')
+        helper=get_user_model().objects.create_user('private-care-helper')
+        circle=SupportCircle.objects.create(owner=owner,name='PRIVATE CARE CIRCLE')
+        SupportMember.objects.create(circle=circle,user=owner,role='owner')
+        member=SupportMember.objects.create(circle=circle,user=helper,role='family',care_permissions={'medications':'view'})
+        record=CareRecord(circle=circle,kind='medications',created_by=owner,updated_by=owner)
+        record.encrypted_payload=seal(circle.pk,'record:'+str(record.pk)+':medications',{'name':'PRIVATE CARE MEDICATION'})
+        record.save()
+        task=SupportTask.objects.create(circle=circle,care_record=record,created_by=owner,title='Pharmacy pickup support',category='errands',status='done',assignee=helper)
+        reward=VolunteerReward.objects.create(support_task=task,volunteer_wallet=self.volunteer,approved_by=self.staff,status='approved')
+        rewards.pay_reward(reward);self.assertEqual(rewards.check_reward(reward)['state'],'paid')
+        page=self.client.get(reverse('reward_receipt',args=[reward.public_id]))
+        for private in ['PRIVATE CARE MEDICATION',circle.name,str(record.pk),record.encrypted_payload,str(task.pk)]:
+            self.assertNotContains(page,private)
+        member.care_permissions={};member.save()
+        self.assertFalse(rewards.support_task_eligible(task))
+        with self.assertRaises(blockchain.ChainError):rewards.pay_reward(reward)
+        self.assertEqual(self.contract.functions.rewardCount().call(),1)

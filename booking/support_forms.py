@@ -1,5 +1,6 @@
 from django import forms
 from .models import SupportTask
+from .care_forms import CareAccessForm
 
 TIMEZONES = [('America/New_York', 'Eastern'), ('America/Chicago', 'Central'),
     ('America/Denver', 'Mountain'), ('America/Phoenix', 'Arizona'),
@@ -11,7 +12,8 @@ class CircleForm(forms.Form):
     timezone = forms.ChoiceField(choices=TIMEZONES, initial='America/Chicago', label='Time zone for this circle')
 
 
-class InviteForm(forms.Form):
+class InviteForm(CareAccessForm):
+    field_order = ['role','appointments','medications','contacts','benefits']
     role = forms.ChoiceField(choices=[('family', 'Family member'), ('neighbor', 'Approved neighbor')], label='Who are you inviting?')
 
 
