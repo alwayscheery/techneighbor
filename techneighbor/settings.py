@@ -72,3 +72,5 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
+
+MIDDLEWARE.append('booking.support_middleware.SupportPrivacyMiddleware')

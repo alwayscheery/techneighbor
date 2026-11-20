@@ -20,6 +20,7 @@
     <a href="{% url 'community_albums' %}"><h3>Photo albums</h3><p>Browse community photos or share one of your own.</p></a>
     <a href="{% url 'learn' %}"><h3>Technology lessons</h3><p>Follow short lessons with written and spoken instructions.</p></a>
   </div>
+  {% if not request.phone_demo %}<p><a class="text-link" href="{% url 'support_home' %}">Create a private support circle for family and neighbors →</a></p>{% endif %}
   <p><a class="text-link" href="{% url 'community_fund' %}">View the community support fund →</a></p>
 </section>
 <section id="how-it-works" class="wrap simple-how" aria-labelledby="how-heading">

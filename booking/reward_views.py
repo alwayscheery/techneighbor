@@ -87,3 +87,25 @@ def pay(request, public_id):
     except Exception:
         messages.error(request, 'Payment could not be confirmed. Check the receipt before retrying; a saved transaction is reused to prevent duplicate payment.')
     return redirect('reward_receipt', public_id=public_id)
+
+
+@staff_required
+def support_reward_queue(request):
+    # The coordinator sees payment requests, never private task/circle content.
+    pending = VolunteerReward.objects.filter(support_task__isnull=False, status='requested').order_by('approved_at')[:100]
+    return private_response(render(request, 'rewards/requests.html', {'pending': pending}))
+
+
+@staff_required
+@require_POST
+def approve_support_reward(request, public_id):
+    from django.db import transaction
+    with transaction.atomic():
+        reward = get_object_or_404(VolunteerReward.objects.select_for_update(), public_id=public_id, support_task__isnull=False)
+        if reward.status == 'requested' and rewards.support_task_eligible(reward.support_task):
+            reward.status = 'approved'; reward.approved_by = request.user
+            reward.save(update_fields=['status', 'approved_by'])
+            messages.success(request, 'The 2-test-USDC reward is approved. Review the receipt before sending.')
+        else:
+            messages.error(request, 'This request is already handled or the task is no longer eligible.')
+    return redirect('reward_receipt', public_id=public_id)

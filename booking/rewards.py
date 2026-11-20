@@ -11,7 +11,7 @@ from web3 import Web3
 
 from . import blockchain
 from .integrations import read_private, signer_lock
-from .models import Booking, VolunteerReward
+from .models import Booking, VolunteerReward, SupportMember
 
 REWARD_AMOUNT = Decimal('2')
 REWARD_WEI = 2 * 10**18
@@ -118,6 +118,8 @@ def check_reward(reward):
                     return {'state': 'failed', 'label': 'The transaction failed. No reward was paid.'}
                 raise blockchain.ChainError('The confirmed transaction did not contain the expected reward.')
             return {'state': 'pending', 'label': 'Waiting for Arc Testnet confirmation'}
+        if reward.status == 'requested':
+            return {'state': 'requested', 'label': 'Awaiting coordinator approval · Not paid yet'}
         return {'state': 'approved', 'label': 'Approved by the coordinator · Not paid yet'}
     except Exception:
         return {'state': 'unknown', 'label': 'Could not verify payment right now. A saved status is not proof of payment.'}
@@ -127,8 +129,12 @@ def pay_reward(reward):
     """Persist the exact signed transaction before sending. Retries rebroadcast it."""
     with signer_lock():
         reward.refresh_from_db()
-        if reward.booking.status != Booking.Status.COMPLETED:
+        if not reward.approved_by_id or not reward.approved_by.is_active or not reward.approved_by.is_staff:
+            raise blockchain.ChainError('A coordinator must approve this reward before payment.')
+        if reward.booking_id and reward.booking.status != Booking.Status.COMPLETED:
             raise blockchain.ChainError('Only a completed session can receive a reward.')
+        if reward.support_task_id and not support_task_eligible(reward.support_task):
+            raise blockchain.ChainError('The circle task must be confirmed complete and its volunteer must still be an eligible member.')
         account = signing_account()
         w3 = blockchain.client()
         contract = verified_contract(w3)
@@ -156,3 +162,11 @@ def pay_reward(reward):
             blockchain.broadcast(w3, reward.signed_transaction, reward.transaction_hash)
             blockchain.receipt_or_none(w3, reward.transaction_hash, wait=True)
         check_reward(reward)
+
+
+def support_task_eligible(task):
+    if task.status != 'done' or not task.assignee_id or task.circle.archived:
+        return False
+    member = SupportMember.objects.filter(circle=task.circle, user_id=task.assignee_id, active=True).select_related('neighbor_profile').first()
+    return bool(member and (member.role != 'neighbor' or (member.neighbor_profile and
+        member.neighbor_profile.status == 'approved' and not member.neighbor_profile.is_sample)))

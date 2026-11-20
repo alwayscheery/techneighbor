@@ -149,3 +149,49 @@ class VolunteerRewardTests(TestCase):
             response=self.client.get(path)
             self.assertNotContains(response,'ElevenLabs')
             self.assertNotContains(response,'ELEVENLABS')
+
+    def test_private_circle_completion_requires_staff_approval_before_real_contract_payment(self):
+        from .models import SupportCircle, SupportMember, SupportTask
+        organizer = get_user_model().objects.create_user('circle-organizer')
+        helper = get_user_model().objects.create_user('circle-helper')
+        circle = SupportCircle.objects.create(owner=organizer, name='PRIVATE CIRCLE NAME')
+        SupportMember.objects.create(circle=circle, user=organizer, role='owner')
+        SupportMember.objects.create(circle=circle, user=helper, role='family')
+        task = SupportTask.objects.create(circle=circle, created_by=organizer, title='PRIVATE CIRCLE TASK',
+            details='PRIVATE CIRCLE NOTES', category='technology', assignee=helper, status='done')
+        reward = VolunteerReward.objects.create(support_task=task, volunteer_wallet=self.volunteer, status='requested')
+        self.client.force_login(self.staff)
+        self.assertEqual(self.client.get(reverse('support_circle', args=[circle.pk])).status_code, 404)
+        pay_url = reverse('pay_reward', args=[reward.public_id])
+        self.client.post(pay_url)
+        self.assertEqual(self.contract.functions.rewardCount().call(), 0)
+        queue = self.client.get(reverse('support_reward_queue'))
+        for private in [circle.name, task.title, task.details, organizer.username, helper.username]:
+            self.assertNotContains(queue, private)
+        self.client.post(reverse('approve_support_reward', args=[reward.public_id]))
+        reward.refresh_from_db(); self.assertEqual(reward.status, 'approved')
+        self.assertEqual(reward.approved_by, self.staff)
+        before = self.w3.eth.get_balance(self.volunteer)
+        self.client.post(pay_url)
+        reward.refresh_from_db(); self.assertEqual(reward.status, 'paid')
+        self.assertEqual(self.w3.eth.get_balance(self.volunteer)-before, 2*10**18)
+        self.client.post(pay_url)
+        self.assertEqual(self.contract.functions.rewardCount().call(), 1)
+        page = self.client.get(reverse('reward_receipt', args=[reward.public_id]))
+        for private in [circle.name, task.title, task.details, str(circle.pk), str(task.pk)]:
+            self.assertNotContains(page, private)
+
+    def test_circle_reward_cannot_be_approved_for_an_incomplete_or_removed_volunteer(self):
+        from .models import SupportCircle, SupportMember, SupportTask
+        owner = get_user_model().objects.create_user('circle-owner')
+        circle = SupportCircle.objects.create(owner=owner, name='Private circle')
+        member = SupportMember.objects.create(circle=circle, user=owner, role='owner')
+        task = SupportTask.objects.create(circle=circle, created_by=owner, title='Example', category='company',
+            status='review', assignee=owner)
+        reward = VolunteerReward.objects.create(support_task=task, volunteer_wallet=self.volunteer, status='requested')
+        self.client.force_login(self.staff)
+        url = reverse('approve_support_reward', args=[reward.public_id])
+        self.client.post(url); reward.refresh_from_db(); self.assertEqual(reward.status, 'requested')
+        task.status='done'; task.save(); member.active=False; member.save()
+        self.client.post(url); reward.refresh_from_db(); self.assertEqual(reward.status, 'requested')
+        self.assertEqual(self.contract.functions.rewardCount().call(), 0)

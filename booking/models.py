@@ -111,17 +111,24 @@ class ServiceCredential(models.Model):
 
 class VolunteerReward(models.Model):
     """Only random public_id, recipient, amount and transaction are published."""
-    booking = models.OneToOneField(Booking, on_delete=models.PROTECT, related_name='reward')
+    booking = models.OneToOneField(Booking, on_delete=models.PROTECT, related_name='reward', null=True, blank=True)
+    support_task = models.OneToOneField('SupportTask', on_delete=models.PROTECT, related_name='reward', null=True, blank=True)
     public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     volunteer_wallet = models.CharField(max_length=42)
-    approved_by = models.ForeignKey('auth.User', on_delete=models.PROTECT)
+    approved_by = models.ForeignKey('auth.User', on_delete=models.PROTECT, null=True, blank=True)
     approved_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=12, default='approved', choices=[
-        ('approved', 'Approved, not paid'), ('pending', 'Awaiting confirmation'),
+        ('requested', 'Awaiting coordinator approval'), ('approved', 'Approved, not paid'), ('pending', 'Awaiting confirmation'),
         ('paid', 'Paid on Arc Testnet'), ('failed', 'Transaction failed'),
     ])
     transaction_hash = models.CharField(max_length=66, blank=True, unique=True, null=True)
     signed_transaction = models.TextField(blank=True, editable=False)
+
+    class Meta:
+        constraints = [models.CheckConstraint(condition=(
+            models.Q(booking__isnull=False, support_task__isnull=True) |
+            models.Q(booking__isnull=True, support_task__isnull=False)
+        ), name='reward_has_exactly_one_source')]
 
     @property
     def chain_uid(self):
@@ -248,3 +255,61 @@ class HostedGuideAudio(models.Model):
     cache_key = models.CharField(max_length=64, primary_key=True)
     prompt = models.CharField(max_length=40)
     audio_data = models.BinaryField(editable=False)
+
+
+class SupportCircle(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    owner = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='owned_support_circles')
+    name = models.CharField(max_length=80)
+    timezone = models.CharField(max_length=64, default='America/Chicago')
+    archived = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class SupportMember(models.Model):
+    circle = models.ForeignKey(SupportCircle, on_delete=models.CASCADE, related_name='members')
+    user = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='support_memberships')
+    role = models.CharField(max_length=12, choices=[('owner', 'Organizer'), ('family', 'Family member'), ('neighbor', 'Approved neighbor')])
+    neighbor_profile = models.ForeignKey(NeighborProfile, on_delete=models.PROTECT, null=True, blank=True)
+    active = models.BooleanField(default=True)
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['circle', 'user'], name='one_support_membership')]
+
+
+class SupportNeighborIdentity(models.Model):
+    user = models.OneToOneField('auth.User', on_delete=models.PROTECT)
+    profile = models.OneToOneField(NeighborProfile, on_delete=models.PROTECT)
+
+
+class SupportInvite(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    circle = models.ForeignKey(SupportCircle, on_delete=models.CASCADE, related_name='invites')
+    token_hash = models.CharField(max_length=64, unique=True, editable=False)
+    role = models.CharField(max_length=12, choices=[('family', 'Family member'), ('neighbor', 'Approved neighbor')])
+    expires_at = models.DateTimeField()
+    used_by = models.ForeignKey('auth.User', on_delete=models.PROTECT, null=True, blank=True)
+    revoked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class SupportTask(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    circle = models.ForeignKey(SupportCircle, on_delete=models.CASCADE, related_name='tasks')
+    created_by = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='support_tasks_created')
+    title = models.CharField(max_length=100)
+    details = models.TextField(max_length=1000, blank=True)
+    category = models.CharField(max_length=16, choices=[('company', 'Company & visits'), ('technology', 'Technology help'), ('errands', 'Everyday errands'), ('transport', 'A ride or outing'), ('other', 'Other support')])
+    due_at = models.DateTimeField(null=True, blank=True)
+    assignee = models.ForeignKey('auth.User', on_delete=models.PROTECT, null=True, blank=True, related_name='support_tasks_claimed')
+    status = models.CharField(max_length=12, default='open', choices=[('open', 'Needs a volunteer'), ('claimed', 'Volunteer assigned'), ('review', 'Awaiting confirmation'), ('done', 'Completed'), ('cancelled', 'Cancelled')])
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class SupportActivity(models.Model):
+    circle = models.ForeignKey(SupportCircle, on_delete=models.CASCADE, related_name='activity')
+    actor = models.ForeignKey('auth.User', on_delete=models.PROTECT)
+    action = models.CharField(max_length=60)
+    task = models.ForeignKey(SupportTask, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)

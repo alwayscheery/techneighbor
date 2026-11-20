@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="{% static 'neighbors.css' %}">
 <link rel="stylesheet" href="{% static 'rewards.css' %}">
 <link rel="stylesheet" href="{% static 'simple.css' %}">
+<link rel="stylesheet" href="{% static 'support.css' %}">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -56,6 +57,7 @@
     <a href="{% url 'neighbors' %}" class="community-nav" {% if request.resolver_match.url_name == 'neighbors' %}aria-current="page"{% endif %}>Nearby neighbors</a>
     <a href="{% url 'community_albums' %}" class="community-nav" {% if request.resolver_match.url_name == 'community_albums' %}aria-current="page"{% endif %}>Photo albums</a>
     <a href="{% url 'learn' %}" class="community-nav" {% if request.resolver_match.url_name == 'learn' %}aria-current="page"{% endif %}>Spoken lessons</a>
+    {% if not request.phone_demo %}<a href="{% url 'support_home' %}" class="community-nav" {% if 'support' in request.resolver_match.url_name %}aria-current="page"{% endif %}>Support circles</a>{% endif %}
     <a href="{% url 'community_fund' %}" class="community-nav" {% if request.resolver_match.url_name == 'community_fund' %}aria-current="page"{% endif %}>Community fund</a>
     {% if user.is_staff %}<a href="{% url 'dashboard' %}" class="nav-secondary">Coordinator</a>{% endif %}
     <a href="{% url 'book' %}" class="button button-small">Book a session <svg class="icon"><use href="#i-arrow"/></svg></a>

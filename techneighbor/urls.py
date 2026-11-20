@@ -1,11 +1,29 @@
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path
-from booking import views
+from booking import views, support_views
 from booking.hosted import health
 from booking import credential_views, reward_views
 from booking import community_views, neighbor_views
 urlpatterns = [
+    path('support/', support_views.home, name='support_home'),
+    path('support/sign-in/', auth_views.LoginView.as_view(template_name='support/auth.html', next_page='support_home'), name='support_login'),
+    path('support/sign-up/', support_views.register, name='support_register'),
+    path('support/sign-out/', auth_views.LogoutView.as_view(next_page='support_home'), name='support_logout'),
+    path('support/create/', support_views.create, name='support_create'),
+    path('support/join/', support_views.join, name='support_join'),
+    path('support/circles/<uuid:circle_id>/', support_views.board, name='support_circle'),
+    path('support/circles/<uuid:circle_id>/tasks/new/', support_views.task_form, name='support_task_create'),
+    path('support/circles/<uuid:circle_id>/tasks/<uuid:task_id>/edit/', support_views.task_form, name='support_task_edit'),
+    path('support/circles/<uuid:circle_id>/tasks/<uuid:task_id>/action/', support_views.task_action, name='support_task_action'),
+    path('support/circles/<uuid:circle_id>/tasks/<uuid:task_id>/reward/', support_views.request_reward, name='support_request_reward'),
+    path('support/circles/<uuid:circle_id>/invite/', support_views.invite, name='support_invite'),
+    path('support/circles/<uuid:circle_id>/members/', support_views.members, name='support_members'),
+    path('support/circles/<uuid:circle_id>/members/<int:member_id>/action/', support_views.member_action, name='support_member_action'),
+    path('support/circles/<uuid:circle_id>/invites/<uuid:invite_id>/revoke/', support_views.revoke_invite, name='support_revoke_invite'),
+    path('support/circles/<uuid:circle_id>/archive/', support_views.archive, name='support_archive'),
+    path('coordinator/rewards/', reward_views.support_reward_queue, name='support_reward_queue'),
+    path('coordinator/rewards/<uuid:public_id>/approve/', reward_views.approve_support_reward, name='approve_support_reward'),
     path('community/fund/', reward_views.community_fund, name='community_fund'),
     path('coordinator/booking/<uuid:reference>/reward/', reward_views.approve, name='approve_reward'),
     path('rewards/<uuid:public_id>/', reward_views.receipt, name='reward_receipt'),
